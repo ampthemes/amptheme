@@ -12,7 +12,6 @@ const blog = defineCollection({
 
 const product = defineCollection({
   type: "content",
-
   schema: z.object({
     title: z.string(),
     description: z.string(),
@@ -27,12 +26,11 @@ const product = defineCollection({
 
 const docs = defineCollection({
   type: "content",
-
   schema: z.object({
     title: z.string(),
     description: z.string(),
-    category: z.string().default("Documentation"),
-    order: z.number().default(999),
+    section: z.string(),
+    order: z.number().optional(),
   }),
 });
 

@@ -6,39 +6,40 @@ import "../../styles/docs.css";
 const docs = await getCollection("docs");
 
 /*
- * Group docs berdasarkan category.
- * Jika category tidak ada,
- * otomatis masuk ke Documentation.
+ * Group otomatis berdasarkan frontmatter:
+ *
+ * category: Getting Started
+ * category: Tools
+ * category: Products
+ * category: Blog
+ *
+ * Tidak perlu lagi menulis sections secara manual.
  */
-const groups = docs.reduce(
-  (acc, item) => {
-    const category = item.data.category || "Documentation";
 
-    if (!acc[category]) {
-      acc[category] = [];
+const sections = docs.reduce(
+  (groups, doc) => {
+    const category = doc.data.category || "Documentation";
+
+    if (!groups[category]) {
+      groups[category] = [];
     }
 
-    acc[category].push(item);
+    groups[category].push(doc);
 
-    return acc;
+    return groups;
   },
   {} as Record<string, typeof docs>
 );
 ---
 
 <MainLayout
-  title="Documentation"
+  title="Docs"
   description="Documentation and guides."
 >
-
   <main class="docs-page">
-
     <div class="docs-shell">
 
-      <!-- =================================
-           SIDEBAR
-      ================================== -->
-
+      <!-- SIDEBAR -->
       <aside class="docs-sidebar">
 
         <div class="docs-filter">
@@ -81,7 +82,7 @@ const groups = docs.reduce(
 
         <nav aria-label="Documentation">
 
-          {Object.entries(groups).map(
+          {Object.entries(sections).map(
             ([category, items]) => (
 
               <div
@@ -101,18 +102,17 @@ const groups = docs.reduce(
                         (a.data.order ?? 999) -
                         (b.data.order ?? 999)
                     )
-                    .map((item) => (
+                    .map((doc) => (
 
                       <li
-                        data-docs-item={item.data.title
-                          .toLowerCase()}
+                        data-docs-item={doc.data.title.toLowerCase()}
                       >
 
                         <a
-                          href={`/docs/${item.id}/`}
+                          href={`/docs/${doc.id}/`}
                           class="docs-link"
                         >
-                          {item.data.title}
+                          {doc.data.title}
                         </a>
 
                       </li>
@@ -131,13 +131,10 @@ const groups = docs.reduce(
       </aside>
 
 
-      <!-- =================================
-           DOCUMENTATION INDEX
-      ================================== -->
+      <!-- CONTENT -->
+      <section class="docs-content">
 
-      <article class="docs-content">
-
-        <header class="docs-header">
+        <div class="docs-hero">
 
           <span class="docs-eyebrow">
             Documentation
@@ -148,32 +145,31 @@ const groups = docs.reduce(
           </h1>
 
           <p class="docs-lead">
-            Panduan, referensi, dan dokumentasi
-            untuk semua fitur dan bagian website.
+            Panduan, referensi, dan dokumentasi untuk memahami
+            platform, tools, products, dan sistem yang tersedia.
           </p>
 
-        </header>
+        </div>
 
 
-        <hr />
+        <!-- GRID TETAP SAMA -->
+        <div class="docs-grid">
 
-
-        <!-- =================================
-             DOCUMENTATION LIST
-        ================================== -->
-
-        <div class="docs-index">
-
-          {Object.entries(groups).map(
+          {Object.entries(sections).map(
             ([category, items]) => (
 
-              <section class="docs-index-section">
+              <section class="docs-card-section">
 
-                <h2>
-                  {category}
-                </h2>
+                <div class="docs-card-heading">
 
-                <div class="docs-index-grid">
+                  <h2>
+                    {category}
+                  </h2>
+
+                </div>
+
+
+                <div class="docs-card-list">
 
                   {items
                     .sort(
@@ -181,24 +177,22 @@ const groups = docs.reduce(
                         (a.data.order ?? 999) -
                         (b.data.order ?? 999)
                     )
-                    .map((item) => (
+                    .map((doc) => (
 
                       <a
-                        href={`/docs/${item.id}/`}
+                        href={`/docs/${doc.id}/`}
                         class="docs-card"
                       >
 
-                        <div class="docs-card-content">
+                        <div>
 
                           <h3>
-                            {item.data.title}
+                            {doc.data.title}
                           </h3>
 
-                          {item.data.description && (
-                            <p>
-                              {item.data.description}
-                            </p>
-                          )}
+                          <p>
+                            {doc.data.description}
+                          </p>
 
                         </div>
 
@@ -219,16 +213,11 @@ const groups = docs.reduce(
 
         </div>
 
-      </article>
+      </section>
 
     </div>
-
   </main>
 
-
-  <!-- =================================
-       DOCS FILTER
-  ================================== -->
 
   <script>
     const filter =

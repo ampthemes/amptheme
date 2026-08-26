@@ -1,642 +1,577 @@
-/* =====================================
+/* =========================================================
    DOCS
    Shared styles for:
-   /docs
-   /docs/[...slug]
-===================================== */
+   /docs/
+   /docs/[...slug]/
+========================================================= */
 
 
-/* =====================================
+/* =========================================================
    PAGE
-===================================== */
+========================================================= */
 
-.docs-page{
-  width:100%;
+.docs-page {
+  width: 100%;
+  max-width: 1200px;
 
-  max-width:1200px;
+  margin: 0 auto;
+  padding: 40px 24px 70px;
 
-  margin:0 auto;
+  color: var(--text);
+}
 
-  padding:40px 24px 70px;
+.docs-shell {
+  width: 100%;
 
-  color:var(--text);
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+
+  gap: 50px;
+
+  align-items: start;
 }
 
 
-/* =====================================
-   DOCS SHELL
-   Sidebar + Content
-===================================== */
-
-.docs-shell{
-  display:grid;
-
-  grid-template-columns:
-    250px minmax(0, 1fr);
-
-  gap:40px;
-
-  align-items:start;
-}
-
-
-/* =====================================
+/* =========================================================
    SIDEBAR
-===================================== */
+========================================================= */
 
-.docs-sidebar{
-  position:sticky;
+.docs-sidebar {
+  position: sticky;
+  top: 82px;
 
-  top:84px;
+  width: 100%;
 
-  min-width:0;
-
-  max-height:calc(100vh - 104px);
-
-  overflow-y:auto;
-
-  scrollbar-width:thin;
+  align-self: start;
 }
 
 
-/* =====================================
-   SIDEBAR FILTER
-===================================== */
+/* =========================================================
+   FILTER
+========================================================= */
 
-.docs-filter{
-  position:sticky;
+.docs-filter {
+  width: 100%;
 
-  top:0;
+  min-height: 42px;
 
-  z-index:2;
+  display: flex;
+  align-items: center;
 
-  display:flex;
-  align-items:center;
+  gap: 9px;
 
-  gap:8px;
+  margin-bottom: 22px;
+  padding: 0 12px;
 
-  margin-bottom:18px;
+  color: var(--text-secondary);
+  background: var(--surface);
 
-  padding:10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
 
-  color:var(--text-secondary);
-
-  background:var(--surface);
-
-  border:1px solid var(--border);
-
-  border-radius:10px;
-
-  box-shadow:var(--shadow);
+  box-sizing: border-box;
 }
 
-.docs-filter svg{
-  flex-shrink:0;
+.docs-filter svg {
+  flex-shrink: 0;
 }
 
-.docs-filter input{
-  width:100%;
+.docs-filter input {
+  width: 100%;
+  min-width: 0;
 
-  min-width:0;
+  padding: 10px 0;
 
-  padding:0;
+  color: var(--text);
 
-  color:var(--text);
+  background: transparent;
 
-  background:transparent;
+  border: 0;
+  outline: 0;
 
-  border:0;
-
-  outline:0;
-
-  font-size:14px;
+  font-size: 14px;
 }
 
-.docs-filter input::placeholder{
-  color:var(--text-secondary);
+.docs-filter input::placeholder {
+  color: var(--text-secondary);
 }
 
 
-/* =====================================
-   DOCS SIDEBAR SECTIONS
-   Native <details>
-===================================== */
+/* =========================================================
+   SIDEBAR SECTIONS
+========================================================= */
 
-.docs-section{
-  margin-bottom:12px;
+.docs-section {
+  margin-bottom: 20px;
+}
 
-  background:var(--surface);
+.docs-section:last-child {
+  margin-bottom: 0;
+}
 
-  border:1px solid var(--border);
+.docs-section-title {
+  margin: 0 0 8px;
+  padding: 0 8px;
 
-  border-radius:10px;
+  color: var(--text-secondary);
 
-  overflow:hidden;
+  font-size: 12px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: .06em;
 }
 
 
-/* =====================================
-   CATEGORY HEADER
-===================================== */
+/* =========================================================
+   DETAILS / COLLAPSIBLE SIDEBAR
+========================================================= */
 
-.docs-section-title{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  width:100%;
-
-  padding:12px 14px;
-
-  color:var(--text);
-
-  background:var(--surface);
-
-  font-size:14px;
-  font-weight:700;
-
-  line-height:1.4;
-
-  cursor:pointer;
-
-  user-select:none;
-
-  list-style:none;
+.docs-section details {
+  width: 100%;
 }
 
+.docs-section summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-/* Remove browser marker */
+  width: 100%;
 
-.docs-section-title::-webkit-details-marker{
-  display:none;
+  padding: 9px 8px;
+
+  color: var(--text-secondary);
+
+  cursor: pointer;
+
+  list-style: none;
+
+  font-size: 13px;
+  font-weight: 700;
 }
 
-.docs-section-title::marker{
-  display:none;
+.docs-section summary::-webkit-details-marker {
+  display: none;
 }
 
+.docs-section summary::after {
+  content: "›";
 
-/* =====================================
-   CATEGORY ARROW
-===================================== */
+  font-size: 17px;
+  line-height: 1;
 
-.docs-section-title svg{
-  flex-shrink:0;
-
-  color:var(--text-secondary);
+  transform: rotate(0deg);
 
   transition:
-    transform .2s ease;
+    transform var(--transition);
 }
 
-.docs-section[open]
-.docs-section-title
-svg{
-  transform:rotate(180deg);
+.docs-section details[open] > summary::after {
+  transform: rotate(90deg);
 }
 
-
-/* =====================================
-   CATEGORY HOVER
-===================================== */
-
-.docs-section-title:hover{
-  background:var(--surface-hover);
+.docs-section summary:hover {
+  color: var(--text);
 }
 
 
-/* =====================================
+/* =========================================================
    SIDEBAR LIST
-===================================== */
+========================================================= */
 
-.docs-section ul{
-  margin:0;
+.docs-section ul {
+  margin: 0;
+  padding: 0;
 
-  padding:0 8px 8px;
-
-  list-style:none;
+  list-style: none;
 }
 
-.docs-section li{
-  margin:2px 0;
+.docs-section li {
+  margin: 2px 0;
 }
 
 
-/* =====================================
+/* =========================================================
    SIDEBAR LINKS
-===================================== */
+========================================================= */
 
-.docs-link{
-  display:block;
+.docs-link {
+  display: block;
 
-  padding:9px 10px;
+  width: 100%;
 
-  color:var(--text-secondary);
+  padding: 9px 12px;
 
-  border-radius:8px;
+  color: var(--text-secondary);
 
-  font-size:14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
 
-  line-height:1.4;
-
-  text-decoration:none;
+  font-size: 14px;
+  line-height: 1.45;
 
   transition:
     color var(--transition),
-    background var(--transition);
+    background var(--transition),
+    border-color var(--transition);
 }
 
-.docs-link:hover{
-  color:var(--primary);
+.docs-link:hover {
+  color: var(--text);
 
-  background:var(--surface-hover);
+  background: var(--surface-hover);
+
+  border-color: var(--border);
 }
 
-.docs-link.active{
-  color:var(--primary);
+.docs-link.active {
+  color: var(--primary);
 
-  background:var(--surface-hover);
+  background: var(--surface);
 
-  font-weight:600;
-}
+  border-color: var(--border);
 
-
-/* =====================================
-   DOCS CONTENT
-===================================== */
-
-.docs-content{
-  min-width:0;
-
-  width:100%;
+  font-weight: 600;
 }
 
 
-/* =====================================
-   DOCS HERO
-   /docs/index.astro
-===================================== */
+/* =========================================================
+   MAIN DOC CONTENT
+========================================================= */
 
-.docs-hero{
-  margin-bottom:40px;
-}
+.docs-content {
+  min-width: 0;
 
-.docs-eyebrow{
-  display:inline-block;
-
-  margin-bottom:10px;
-
-  color:var(--primary);
-
-  font-size:13px;
-  font-weight:700;
-
-  letter-spacing:.04em;
-
-  text-transform:uppercase;
-}
-
-.docs-hero h1{
-  margin:0;
-
-  color:var(--text);
-
-  font-size:clamp(2rem,4vw,3rem);
-
-  line-height:1.15;
-
-  letter-spacing:-.03em;
-}
-
-.docs-lead{
-  max-width:760px;
-
-  margin:16px 0 0;
-
-  color:var(--text-secondary);
-
-  font-size:17px;
-
-  line-height:1.75;
+  width: 100%;
 }
 
 
-/* =====================================
-   DOCS GRID
-   /docs/index.astro
-===================================== */
+/* =========================================================
+   DOC HERO
+========================================================= */
 
-.docs-grid{
-  display:grid;
+.docs-hero {
+  margin-bottom: 34px;
+}
+
+.docs-eyebrow {
+  display: inline-block;
+
+  margin-bottom: 10px;
+
+  color: var(--primary);
+
+  font-size: 13px;
+  font-weight: 700;
+
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.docs-hero h1 {
+  margin: 0;
+
+  color: var(--text);
+
+  font-size: clamp(32px, 5vw, 46px);
+  font-weight: 800;
+
+  line-height: 1.15;
+}
+
+.docs-lead {
+  max-width: 760px;
+
+  margin: 16px 0 0;
+
+  color: var(--text-secondary);
+
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+
+/* =========================================================
+   DOC GRID — INDEX
+========================================================= */
+
+.docs-grid {
+  width: 100%;
+
+  display: grid;
 
   grid-template-columns:
-    repeat(2,minmax(0,1fr));
+    repeat(2, minmax(0, 1fr));
 
-  gap:24px;
+  gap: 28px;
 }
 
 
-/* =====================================
-   DOCS CARD SECTION
-===================================== */
+/* =========================================================
+   CARD SECTION
+========================================================= */
 
-.docs-card-section{
-  min-width:0;
+.docs-card-section {
+  min-width: 0;
+}
+
+.docs-card-heading {
+  margin-bottom: 12px;
+}
+
+.docs-card-heading h2 {
+  margin: 0;
+
+  color: var(--text);
+
+  font-size: 18px;
+  font-weight: 700;
 }
 
 
-/* =====================================
-   CARD HEADING
-===================================== */
-
-.docs-card-heading{
-  margin-bottom:12px;
-}
-
-.docs-card-heading h2{
-  margin:0;
-
-  color:var(--text);
-
-  font-size:18px;
-
-  line-height:1.4;
-}
-
-
-/* =====================================
+/* =========================================================
    CARD LIST
-===================================== */
+========================================================= */
 
-.docs-card-list{
-  display:flex;
+.docs-card-list {
+  display: grid;
 
-  flex-direction:column;
-
-  gap:10px;
+  gap: 10px;
 }
 
 
-/* =====================================
-   DOCS CARD
-===================================== */
+/* =========================================================
+   DOC CARD
+========================================================= */
 
-.docs-card{
-  position:relative;
+.docs-card {
+  min-height: 110px;
 
-  display:flex;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-  align-items:center;
+  gap: 20px;
 
-  justify-content:space-between;
+  padding: 20px;
 
-  gap:20px;
+  color: var(--text);
 
-  min-height:100px;
+  background: var(--surface);
 
-  padding:20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
 
-  color:var(--text);
-
-  background:var(--surface);
-
-  border:1px solid var(--border);
-
-  border-radius:var(--radius);
-
-  box-shadow:var(--shadow);
-
-  text-decoration:none;
+  box-shadow: var(--shadow);
 
   transition:
-    background .25s ease,
-    border-color .25s ease,
-    transform .25s ease,
-    box-shadow .25s ease;
+    background var(--transition),
+    border-color var(--transition),
+    transform var(--transition),
+    box-shadow var(--transition);
 }
 
-.docs-card:hover{
-  background:var(--surface-hover);
+.docs-card:hover {
+  background: var(--surface-hover);
 
-  border-color:var(--primary);
+  border-color: var(--primary);
 
-  transform:translateY(-2px);
+  transform: translateY(-2px);
 }
 
+.docs-card h3 {
+  margin: 0 0 7px;
 
-/* =====================================
-   CARD TEXT
-===================================== */
+  color: var(--text);
 
-.docs-card h3{
-  margin:0 0 7px;
+  font-size: 16px;
+  font-weight: 700;
 
-  color:var(--text);
-
-  font-size:16px;
-
-  line-height:1.4;
+  line-height: 1.4;
 }
 
-.docs-card p{
-  margin:0;
+.docs-card p {
+  margin: 0;
 
-  color:var(--text-secondary);
+  color: var(--text-secondary);
 
-  font-size:14px;
-
-  line-height:1.6;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
+.docs-card-arrow {
+  flex-shrink: 0;
 
-/* =====================================
-   CARD ARROW
-===================================== */
+  color: var(--primary);
 
-.docs-card-arrow{
-  flex-shrink:0;
-
-  color:var(--primary);
-
-  font-size:20px;
+  font-size: 22px;
 
   transition:
-    transform .25s ease;
+    transform var(--transition);
 }
 
-.docs-card:hover .docs-card-arrow{
-  transform:translateX(4px);
-}
-
-
-/* =====================================
-   DOCUMENT HEADER
-   /docs/[...slug].astro
-===================================== */
-
-.docs-header{
-  margin-bottom:28px;
-}
-
-.docs-header h1{
-  margin:0;
-
-  color:var(--text);
-
-  font-size:clamp(2rem,4vw,2.8rem);
-
-  line-height:1.15;
-
-  letter-spacing:-.03em;
-}
-
-.docs-header .docs-lead{
-  margin-top:14px;
+.docs-card:hover .docs-card-arrow {
+  transform: translateX(4px);
 }
 
 
-/* =====================================
-   DOCUMENT DIVIDER
-===================================== */
+/* =========================================================
+   ARTICLE HEADER
+========================================================= */
 
-.docs-content > hr{
-  margin:0 0 35px;
+.docs-header {
+  margin-bottom: 28px;
+}
 
-  border:0;
+.docs-header h1 {
+  margin: 0;
 
-  border-top:1px solid var(--border);
+  color: var(--text);
+
+  font-size: clamp(30px, 5vw, 44px);
+  font-weight: 800;
+
+  line-height: 1.2;
+}
+
+.docs-header .docs-lead {
+  margin-top: 14px;
 }
 
 
-/* =====================================
-   DOCUMENT PROSE
-===================================== */
+/* =========================================================
+   ARTICLE HR
+========================================================= */
 
-.docs-prose{
-  max-width:820px;
+.docs-content > hr,
+.docs-header + hr {
+  margin: 0 0 34px;
 
-  color:var(--text);
+  border: 0;
 
-  font-size:16px;
-
-  line-height:1.8;
+  border-top: 1px solid var(--border);
 }
 
 
-/* =====================================
-   PROSE HEADINGS
-===================================== */
+/* =========================================================
+   PROSE
+========================================================= */
 
-.docs-prose h2{
-  margin:44px 0 16px;
+.docs-prose {
+  max-width: 820px;
 
-  color:var(--text);
+  color: var(--text);
 
-  font-size:26px;
-
-  line-height:1.3;
-
-  letter-spacing:-.02em;
-}
-
-.docs-prose h3{
-  margin:34px 0 13px;
-
-  color:var(--text);
-
-  font-size:21px;
-
-  line-height:1.4;
-}
-
-.docs-prose h4{
-  margin:28px 0 10px;
-
-  color:var(--text);
-
-  font-size:18px;
-
-  line-height:1.4;
+  font-size: 16px;
+  line-height: 1.8;
 }
 
 
-/* =====================================
-   PROSE PARAGRAPH
-===================================== */
+/* =========================================================
+   PROSE — HEADINGS
+========================================================= */
 
-.docs-prose p{
-  margin:0 0 18px;
+.docs-prose h2 {
+  margin: 42px 0 14px;
 
-  color:var(--text-secondary);
+  color: var(--text);
 
-  line-height:1.8;
+  font-size: 26px;
+  font-weight: 750;
+
+  line-height: 1.3;
+}
+
+.docs-prose h3 {
+  margin: 32px 0 12px;
+
+  color: var(--text);
+
+  font-size: 21px;
+  font-weight: 700;
+
+  line-height: 1.4;
+}
+
+.docs-prose h4 {
+  margin: 26px 0 10px;
+
+  color: var(--text);
+
+  font-size: 18px;
+  font-weight: 700;
 }
 
 
-/* =====================================
-   PROSE LINKS
-===================================== */
+/* =========================================================
+   PROSE — PARAGRAPH
+========================================================= */
 
-.docs-prose a{
-  color:var(--primary);
-
-  text-decoration:underline;
-
-  text-decoration-thickness:1px;
-
-  text-underline-offset:3px;
+.docs-prose p {
+  margin: 0 0 18px;
 }
 
-.docs-prose a:hover{
-  text-decoration-thickness:2px;
+.docs-prose strong {
+  color: var(--text);
+
+  font-weight: 700;
 }
 
 
-/* =====================================
-   PROSE STRONG
-===================================== */
+/* =========================================================
+   PROSE — LINKS
+========================================================= */
 
-.docs-prose strong{
-  color:var(--text);
+.docs-prose a {
+  color: var(--primary);
 
-  font-weight:700;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.docs-prose a:hover {
+  text-decoration-thickness: 2px;
 }
 
 
-/* =====================================
-   PROSE LISTS
-===================================== */
+/* =========================================================
+   PROSE — LISTS
+========================================================= */
 
 .docs-prose ul,
-.docs-prose ol{
-  margin:0 0 22px;
+.docs-prose ol {
+  margin: 0 0 20px;
 
-  padding-left:26px;
-
-  color:var(--text-secondary);
+  padding-left: 25px;
 }
 
-.docs-prose li{
-  margin:7px 0;
+.docs-prose li {
+  margin: 7px 0;
+}
 
-  padding-left:4px;
+.docs-prose ul ul,
+.docs-prose ol ol,
+.docs-prose ul ol,
+.docs-prose ol ul {
+  margin-top: 7px;
+  margin-bottom: 7px;
 }
 
 
-/* =====================================
-   INLINE CODE
-===================================== */
+/* =========================================================
+   PROSE — INLINE CODE
+========================================================= */
 
-.docs-prose code{
-  padding:2px 6px;
+.docs-prose code {
+  padding: 2px 6px;
 
-  color:var(--text);
+  color: var(--text);
 
-  background:var(--surface-hover);
+  background: var(--surface-hover);
 
-  border:1px solid var(--border);
-
-  border-radius:6px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
 
   font-family:
     "SFMono-Regular",
@@ -644,404 +579,367 @@ svg{
     "Liberation Mono",
     monospace;
 
-  font-size:.9em;
+  font-size: .9em;
 }
 
 
-/* =====================================
-   CODE BLOCK
-===================================== */
+/* =========================================================
+   PROSE — CODE BLOCK
+========================================================= */
 
-.docs-prose pre{
-  margin:24px 0;
+.docs-prose pre {
+  width: 100%;
 
-  padding:18px 20px;
+  margin: 24px 0;
 
-  max-width:100%;
+  padding: 18px 20px;
 
-  overflow-x:auto;
+  overflow-x: auto;
 
-  color:#e1e4e8;
+  color: var(--text);
 
-  background:#24292e;
+  background: var(--surface);
 
-  border:1px solid var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
 
-  border-radius:12px;
+  box-shadow: var(--shadow);
 
-  line-height:1.65;
+  line-height: 1.65;
 
-  -webkit-overflow-scrolling:touch;
+  tab-size: 2;
 }
 
-.docs-prose pre code{
-  display:block;
+.docs-prose pre code {
+  display: block;
 
-  padding:0;
+  padding: 0;
 
-  color:inherit;
+  color: inherit;
 
-  background:none;
+  background: transparent;
 
-  border:0;
+  border: 0;
+  border-radius: 0;
 
-  border-radius:0;
-
-  font-family:
-    "SFMono-Regular",
-    Consolas,
-    "Liberation Mono",
-    monospace;
-
-  font-size:13px;
-
-  line-height:1.65;
+  font-size: 13px;
 }
 
 
-/* =====================================
-   BLOCKQUOTE
-===================================== */
+/* =========================================================
+   PROSE — BLOCKQUOTE
+========================================================= */
 
-.docs-prose blockquote{
-  margin:24px 0;
+.docs-prose blockquote {
+  margin: 24px 0;
 
-  padding:16px 20px;
+  padding: 14px 20px;
 
-  color:var(--text-secondary);
+  color: var(--text-secondary);
 
-  background:var(--surface);
+  background: var(--surface);
 
-  border-left:4px solid var(--primary);
-
-  border-radius:0 10px 10px 0;
+  border-left: 4px solid var(--primary);
+  border-radius: 0 10px 10px 0;
 }
 
-.docs-prose blockquote p{
-  margin:0;
+.docs-prose blockquote p:last-child {
+  margin-bottom: 0;
 }
 
 
-/* =====================================
-   TABLE
-===================================== */
+/* =========================================================
+   PROSE — TABLE
+========================================================= */
 
-.docs-prose table{
-  display:block;
+.docs-prose table {
+  width: 100%;
 
-  width:100%;
+  margin: 26px 0;
 
-  margin:28px 0;
+  border-collapse: collapse;
 
-  overflow-x:auto;
+  overflow: hidden;
 
-  border-collapse:collapse;
-
-  -webkit-overflow-scrolling:touch;
+  font-size: 14px;
 }
 
 .docs-prose th,
-.docs-prose td{
-  padding:11px 14px;
+.docs-prose td {
+  padding: 11px 13px;
 
-  color:var(--text-secondary);
+  text-align: left;
 
-  border:1px solid var(--border);
-
-  text-align:left;
-
-  vertical-align:top;
-
-  white-space:nowrap;
+  border: 1px solid var(--border);
 }
 
-.docs-prose th{
-  color:var(--text);
+.docs-prose th {
+  color: var(--text);
 
-  background:var(--surface-hover);
+  background: var(--surface-hover);
 
-  font-weight:700;
+  font-weight: 700;
 }
 
+.docs-prose td {
+  color: var(--text-secondary);
 
-/* =====================================
-   IMAGES
-===================================== */
-
-.docs-prose img{
-  display:block;
-
-  max-width:100%;
-
-  height:auto;
-
-  margin:28px 0;
-
-  border:1px solid var(--border);
-
-  border-radius:var(--radius);
+  background: var(--surface);
 }
 
 
-/* =====================================
-   HORIZONTAL RULE
-===================================== */
+/* =========================================================
+   PROSE — IMAGE
+========================================================= */
 
-.docs-prose hr{
-  margin:36px 0;
+.docs-prose img {
+  display: block;
 
-  border:0;
+  max-width: 100%;
+  height: auto;
 
-  border-top:1px solid var(--border);
+  margin: 24px 0;
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
 }
 
 
-/* =====================================
-   DOCUMENT PAGINATION
-===================================== */
+/* =========================================================
+   PROSE — HR
+========================================================= */
 
-.docs-pagination{
-  display:grid;
+.docs-prose hr {
+  margin: 35px 0;
+
+  border: 0;
+
+  border-top: 1px solid var(--border);
+}
+
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.docs-pagination {
+  max-width: 820px;
+
+  display: grid;
 
   grid-template-columns:
-    minmax(0,1fr)
-    minmax(0,1fr);
+    minmax(0, 1fr)
+    minmax(0, 1fr);
 
-  gap:16px;
+  gap: 16px;
 
-  margin-top:55px;
+  margin-top: 55px;
+  padding-top: 24px;
 
-  padding-top:25px;
-
-  border-top:1px solid var(--border);
+  border-top: 1px solid var(--border);
 }
 
-.docs-pagination-item{
-  display:flex;
+.docs-pagination-item {
+  min-width: 0;
 
-  flex-direction:column;
+  display: flex;
+  flex-direction: column;
 
-  gap:5px;
+  gap: 5px;
 
-  min-width:0;
+  padding: 16px;
 
-  padding:16px 18px;
+  color: var(--text);
 
-  color:var(--text);
+  background: var(--surface);
 
-  background:var(--surface);
-
-  border:1px solid var(--border);
-
-  border-radius:12px;
-
-  text-decoration:none;
+  border: 1px solid var(--border);
+  border-radius: 12px;
 
   transition:
-    background .25s ease,
-    border-color .25s ease,
-    transform .25s ease;
+    background var(--transition),
+    border-color var(--transition),
+    transform var(--transition);
 }
 
-.docs-pagination-item:hover{
-  background:var(--surface-hover);
+.docs-pagination-item:hover {
+  background: var(--surface-hover);
 
-  border-color:var(--primary);
+  border-color: var(--primary);
 
-  transform:translateY(-1px);
+  transform: translateY(-1px);
 }
 
-.docs-pagination-item span{
-  color:var(--text-secondary);
+.docs-pagination-item span {
+  color: var(--text-secondary);
 
-  font-size:12px;
+  font-size: 12px;
+  font-weight: 600;
 
-  font-weight:600;
-
-  text-transform:uppercase;
-
-  letter-spacing:.04em;
+  text-transform: uppercase;
+  letter-spacing: .05em;
 }
 
-.docs-pagination-item strong{
-  color:var(--text);
+.docs-pagination-item strong {
+  color: var(--text);
 
-  font-size:14px;
-
-  line-height:1.5;
+  font-size: 14px;
 }
 
-.docs-pagination-item.next{
-  text-align:right;
+.docs-pagination-item.next {
+  text-align: right;
 }
 
 
-/* =====================================
+/* =========================================================
    TABLET
-===================================== */
+========================================================= */
 
-@media(max-width:900px){
+@media (max-width: 900px) {
 
-  .docs-shell{
-    grid-template-columns:
-      210px minmax(0,1fr);
+  .docs-shell {
+    grid-template-columns: 210px minmax(0, 1fr);
 
-    gap:28px;
+    gap: 30px;
   }
 
-  .docs-grid{
-    grid-template-columns:
-      1fr;
+  .docs-grid {
+    grid-template-columns: 1fr;
   }
 
 }
 
 
-/* =====================================
+/* =========================================================
    MOBILE
-===================================== */
+========================================================= */
 
-@media(max-width:768px){
+@media (max-width: 768px) {
 
-  .docs-page{
-    padding:
-      30px 20px 55px;
+  .docs-page {
+    padding: 30px 20px 55px;
   }
 
-  .docs-shell{
-    display:block;
+  .docs-shell {
+    display: block;
   }
 
-
-  /* Sidebar becomes normal flow */
-
-  .docs-sidebar{
+  .docs-sidebar {
     position:static;
 
-    max-height:none;
-
-    overflow:visible;
-
-    margin-bottom:35px;
+    margin-bottom: 35px;
   }
 
-
-  .docs-filter{
-    position:sticky;
-
-    top:72px;
-
-    margin-bottom:14px;
+  .docs-filter {
+    margin-bottom: 18px;
   }
 
-
-  .docs-section{
-    margin-bottom:10px;
+  .docs-section {
+    margin-bottom: 10px;
   }
 
-
-  .docs-grid{
-    grid-template-columns:1fr;
-
-    gap:18px;
+  .docs-section-title {
+    padding-left: 4px;
   }
 
-
-  .docs-card{
-    min-height:90px;
-
-    padding:17px;
+  .docs-section summary {
+    padding: 11px 10px;
   }
 
+  .docs-link {
+    padding: 10px 12px;
+  }
 
-  .docs-prose{
-    font-size:15px;
+  .docs-hero {
+    margin-bottom: 28px;
+  }
+
+  .docs-hero h1 {
+    font-size: 34px;
+  }
+
+  .docs-lead {
+    font-size: 16px;
+  }
+
+  .docs-grid {
+    gap: 24px;
+  }
+
+  .docs-card {
+    padding: 18px;
+  }
+
+  .docs-header h1 {
+    font-size: 32px;
+  }
+
+  .docs-prose {
+    font-size: 15px;
+  }
+
+  .docs-prose h2 {
+    font-size: 24px;
+  }
+
+  .docs-prose h3 {
+    font-size: 20px;
+  }
+
+  .docs-pagination {
+    grid-template-columns: 1fr;
+  }
+
+  .docs-pagination-item.next {
+    text-align: left;
   }
 
 }
 
 
-/* =====================================
+/* =========================================================
    SMALL MOBILE
-===================================== */
+========================================================= */
 
-@media(max-width:600px){
+@media (max-width: 480px) {
 
-  .docs-page{
-    padding:
-      25px 16px 45px;
+  .docs-page {
+    padding-right: 14px;
+    padding-left: 14px;
   }
 
-  .docs-hero{
-    margin-bottom:30px;
+  .docs-hero h1 {
+    font-size: 30px;
   }
 
-  .docs-hero h1{
-    font-size:2rem;
+  .docs-header h1 {
+    font-size: 29px;
   }
 
-  .docs-lead{
-    font-size:15px;
+  .docs-card {
+    min-height: auto;
+
+    padding: 16px;
   }
 
-  .docs-header h1{
-    font-size:2rem;
+  .docs-card-arrow {
+    font-size: 19px;
   }
 
-  .docs-prose h2{
-    font-size:23px;
+  .docs-prose pre {
+    padding: 14px;
+
+    border-radius: 9px;
+
+    font-size: 12px;
   }
 
-  .docs-prose h3{
-    font-size:19px;
-  }
+  .docs-prose table {
+    display: block;
 
-  .docs-prose pre{
-    margin-left:0;
-    margin-right:0;
+    overflow-x: auto;
 
-    padding:15px;
-
-    border-radius:9px;
-
-    font-size:12px;
-  }
-
-  .docs-pagination{
-    grid-template-columns:1fr;
-
-    gap:10px;
-  }
-
-  .docs-pagination-item.next{
-    text-align:left;
-  }
-
-}
-
-
-/* =====================================
-   VERY SMALL MOBILE
-===================================== */
-
-@media(max-width:420px){
-
-  .docs-card{
-    gap:12px;
-
-    padding:15px;
-  }
-
-  .docs-card h3{
-    font-size:15px;
-  }
-
-  .docs-card p{
-    font-size:13px;
-  }
-
-  .docs-card-arrow{
-    font-size:18px;
+    white-space: nowrap;
   }
 
 }

@@ -5,256 +5,142 @@ import "../../styles/docs.css";
 
 const docs = await getCollection("docs");
 
-/*
- * Group berdasarkan category
- */
-const groupedDocs = docs.reduce(
-  (groups, doc) => {
-    const category = doc.data.category || "Documentation";
+const sections = Object.entries(
+  docs.reduce<Record<string, typeof docs>>((groups, doc) => {
+    const section = doc.data.section;
 
-    if (!groups[category]) {
-      groups[category] = [];
+    if (!groups[section]) {
+      groups[section] = [];
     }
 
-    groups[category].push(doc);
+    groups[section].push(doc);
 
     return groups;
-  },
-  {} as Record<string, typeof docs>
-);
-
-/*
- * Urutkan setiap category berdasarkan order
- */
-for (const category in groupedDocs) {
-  groupedDocs[category].sort(
-    (a, b) =>
-      (a.data.order ?? 999) -
-      (b.data.order ?? 999)
-  );
-}
+  }, {})
+)
+  .map(([title, items]) => ({
+    title,
+    items: items.sort(
+      (a, b) => (a.data.order ?? 999) - (b.data.order ?? 999)
+    ),
+  }))
+  .sort((a, b) => a.title.localeCompare(b.title));
 ---
 
 <MainLayout
   title="Documentation"
-  description="Documentation, guides, and references."
+  description="Documentation, guides, tools, products, and resources."
 >
-  <main class="docs-page">
+  <main class="docs-index">
 
-    <div class="docs-shell">
+    <!-- =========================================
+         DOCS HEADER
+    ========================================== -->
 
-      <!-- SIDEBAR -->
-      <aside class="docs-sidebar">
+    <section class="docs-hero">
+      <div class="docs-container">
 
-        <div class="docs-filter">
-          <svg
-            viewBox="0 0 24 24"
-            width="16"
-            height="16"
-            aria-hidden="true"
-          >
-            <circle
-              cx="11"
-              cy="11"
-              r="7"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            />
-
-            <line
-              x1="21"
-              y1="21"
-              x2="16.65"
-              y2="16.65"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-          </svg>
-
-          <input
-            type="search"
-            id="docs-filter"
-            placeholder="Filter docs..."
-            aria-label="Filter documentation"
-          />
+        <div class="docs-eyebrow">
+          DOCUMENTATION
         </div>
 
-        <nav aria-label="Documentation">
+        <h1>
+          Documentation
+        </h1>
 
-          {Object.entries(groupedDocs).map(
-            ([category, items]) => (
+        <p>
+          Panduan, referensi, dan dokumentasi lengkap untuk tools,
+          products, blog, dan layanan yang tersedia.
+        </p>
 
-              <div
-                class="docs-section"
-                data-docs-section
-              >
-
-                <p class="docs-section-title">
-                  {category}
-                </p>
-
-                <ul>
-
-                  {items.map((doc) => (
-
-                    <li
-                      data-docs-item={doc.data.title.toLowerCase()}
-                    >
-                      <a
-                        href={`/docs/${doc.id}/`}
-                        class="docs-link"
-                      >
-                        {doc.data.title}
-                      </a>
-                    </li>
-
-                  ))}
-
-                </ul>
-
-              </div>
-
-            )
-          )}
-
-        </nav>
-
-      </aside>
+      </div>
+    </section>
 
 
-      <!-- CONTENT -->
+    <!-- =========================================
+         DOCS CONTENT
+    ========================================== -->
 
-      <section class="docs-content">
+    <section class="docs-directory">
+      <div class="docs-container">
 
-        <header class="docs-hero">
+        <div class="docs-directory-header">
+          <div>
+            <span class="docs-label">
+              EXPLORE
+            </span>
 
-          <span class="docs-eyebrow">
-            Documentation
+            <h2>
+              Documentation
+            </h2>
+          </div>
+
+          <span class="docs-count">
+            {docs.length} {docs.length === 1 ? "document" : "documents"}
           </span>
-
-          <h1>
-            Documentation
-          </h1>
-
-          <p class="docs-lead">
-            Panduan, referensi, dan dokumentasi
-            untuk platform ini.
-          </p>
-
-        </header>
+        </div>
 
 
-        <div class="docs-grid">
+        <!-- =========================================
+             DOCUMENTATION SECTIONS
+        ========================================== -->
 
-          {Object.entries(groupedDocs).map(
-            ([category, items]) => (
+        <div class="docs-sections">
 
-              <section class="docs-card-section">
+          {
+            sections.map((section) => (
+              <section class="docs-section">
 
-                <div class="docs-card-heading">
-                  <h2>
-                    {category}
-                  </h2>
+                <div class="docs-section-header">
+                  <h3>
+                    {section.title}
+                  </h3>
+
+                  <span>
+                    {section.items.length}
+                  </span>
                 </div>
 
-                <div class="docs-card-list">
 
-                  {items.map((doc) => (
+                <div class="docs-grid">
 
-                    <a
-                      href={`/docs/${doc.id}/`}
-                      class="docs-card"
-                    >
+                  {
+                    section.items.map((doc) => (
+                      <a
+                        href={`/docs/${doc.slug}/`}
+                        class="docs-card"
+                      >
 
-                      <div>
+                        <div class="docs-card-content">
 
-                        <h3>
-                          {doc.data.title}
-                        </h3>
+                          <h4>
+                            {doc.data.title}
+                          </h4>
 
-                        <p>
-                          {doc.data.description}
-                        </p>
+                          <p>
+                            {doc.data.description}
+                          </p>
 
-                      </div>
+                        </div>
 
-                      <span class="docs-card-arrow">
-                        →
-                      </span>
+                        <div class="docs-card-arrow" aria-hidden="true">
+                          →
+                        </div>
 
-                    </a>
-
-                  ))}
+                      </a>
+                    ))
+                  }
 
                 </div>
 
               </section>
-
-            )
-          )}
+            ))
+          }
 
         </div>
 
-      </section>
-
-    </div>
+      </div>
+    </section>
 
   </main>
-
-
-  <script>
-    const filter =
-      document.querySelector("#docs-filter");
-
-    const sections =
-      document.querySelectorAll(
-        "[data-docs-section]"
-      );
-
-    filter?.addEventListener("input", () => {
-
-      const query =
-        (filter as HTMLInputElement)
-          .value
-          .trim()
-          .toLowerCase();
-
-      sections.forEach((section) => {
-
-        let visible = 0;
-
-        section
-          .querySelectorAll("[data-docs-item]")
-          .forEach((item) => {
-
-            const title =
-              item.getAttribute(
-                "data-docs-item"
-              ) || "";
-
-            const match =
-              title.includes(query);
-
-            (
-              item as HTMLElement
-            ).style.display =
-              match ? "" : "none";
-
-            if (match) {
-              visible++;
-            }
-
-          });
-
-        (
-          section as HTMLElement
-        ).style.display =
-          visible > 0 ? "" : "none";
-
-      });
-
-    });
-  </script>
 </MainLayout>

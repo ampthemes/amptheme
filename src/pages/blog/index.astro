@@ -1,0 +1,255 @@
+---
+import MainLayout from "../../layouts/MainLayout.astro";
+import { SITE } from "../../lib/site";
+import "../../styles/blog.css";
+import { getCollection } from "astro:content";
+
+const posts = await getCollection("blog");
+
+/* =========================================
+   FORMAT DATE
+========================================= */
+
+function formatDate(dateValue: unknown) {
+  if (!dateValue) return "";
+
+  const date = new Date(String(dateValue));
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
+/* =========================================
+   SORT ARTICLES
+========================================= */
+
+const sortedPosts = [...posts].sort((a, b) => {
+  const dateA = new Date(String(a.data.date || "")).getTime();
+  const dateB = new Date(String(b.data.date || "")).getTime();
+
+  const safeA = Number.isNaN(dateA) ? 0 : dateA;
+  const safeB = Number.isNaN(dateB) ? 0 : dateB;
+
+  return safeB - safeA;
+});
+
+/* =========================================
+   SEO
+========================================= */
+
+const pageTitle =
+  "Blog AI, Teknologi & SEO | AI Mr Ferdy";
+
+const pageDescription =
+  "Kumpulan artikel AI, teknologi, SEO, otomasi, tools digital, dan berbagai informasi teknologi praktis dari AI Mr Ferdy.";
+---
+
+<MainLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonical={SITE.url("/blog/")}
+  pageCSS={["blog"]}
+>
+
+  <!-- =====================================
+       BLOG HERO
+  ====================================== -->
+
+  <section class="blog-hero">
+
+    <div class="blog-hero-container">
+
+      <div class="blog-hero-content">
+
+        <span class="blog-badge">
+          AI MR FERDY
+        </span>
+
+        <h1>
+          Blog AI & Teknologi Digital
+        </h1>
+
+        <p>
+          Temukan pembahasan seputar kecerdasan buatan,
+          SEO, otomasi, tools digital, pengembangan website,
+          dan perkembangan teknologi yang relevan dengan
+          kebutuhan digital saat ini.
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================
+       ARTICLES
+  ====================================== -->
+
+  <main class="blog-page">
+
+    <div class="container-page">
+
+      <header class="section-heading">
+
+        <h2 class="section-title">
+          Artikel Terbaru
+        </h2>
+
+        <p class="section-desc">
+          Jelajahi artikel dan panduan terbaru yang
+          membahas AI, teknologi, SEO, serta berbagai
+          solusi digital secara praktis.
+        </p>
+
+      </header>
+
+
+      {
+        sortedPosts.length > 0 ? (
+
+          <div class="blog-grid">
+
+            {sortedPosts.map((post) => {
+
+              const formattedDate = formatDate(post.data.date);
+
+              const image =
+                post.data.image?.trim() ||
+                SITE.url(`/api/og/${post.slug}.svg`);
+
+              return (
+
+                <article class="blog-card">
+
+                  <a
+                    href={`/blog/${post.slug}/`}
+                    class="blog-card-link"
+                  >
+
+                    <!-- IMAGE -->
+
+                    <div class="blog-card-image">
+
+                      <img
+                        src={image}
+                        alt={post.data.title}
+                        loading="lazy"
+                        decoding="async"
+                        width="1200"
+                        height="630"
+                      />
+
+                    </div>
+
+
+                    <!-- CONTENT -->
+
+                    <div class="blog-card-content">
+
+                      <div class="blog-card-meta">
+
+                        {formattedDate && (
+                          <time datetime={String(post.data.date)}>
+                            {formattedDate}
+                          </time>
+                        )}
+
+                      </div>
+
+
+                      <h3>
+                        {post.data.title}
+                      </h3>
+
+
+                      {post.data.description && (
+
+                        <p>
+                          {post.data.description}
+                        </p>
+
+                      )}
+
+
+                      <span class="readmore">
+                        Baca Artikel →
+                      </span>
+
+                    </div>
+
+                  </a>
+
+                </article>
+
+              );
+
+            })}
+
+          </div>
+
+        ) : (
+
+          <div class="empty-state">
+
+            <h2>
+              Belum Ada Artikel
+            </h2>
+
+            <p>
+              Artikel terbaru akan ditampilkan di halaman
+              ini setelah tersedia.
+            </p>
+
+          </div>
+
+        )
+      }
+
+    </div>
+
+  </main>
+
+
+  <!-- =====================================
+       CTA
+  ====================================== -->
+
+  <section class="cta">
+
+    <div class="container-page">
+
+      <div class="cta-content">
+
+        <h2>
+          Jelajahi AI dan Teknologi Digital
+        </h2>
+
+        <p>
+          Temukan berbagai tools, panduan, dan informasi
+          teknologi yang dapat membantu aktivitas digital
+          menjadi lebih praktis.
+        </p>
+
+        <a
+          href="/tools/"
+          class="btn btn-primary"
+        >
+          Lihat AI Tools
+        </a>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</MainLayout>

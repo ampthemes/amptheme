@@ -1,0 +1,431 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { getCollection } from 'astro:content';
+
+const products = await getCollection('product');
+
+const featuredProducts = products
+  .filter(product => product.data.featured)
+  .map(product => {
+    const displayImage =
+      product.data.image?.trim()
+      || product.data.gallery?.find(img => img?.trim())
+      || `/api/og/${product.slug}.svg`;
+
+    return {
+      ...product,
+      displayImage
+    };
+  });
+---
+
+<MainLayout
+  title="Products | AI PRINT"
+  description="Browse premium POD marketplace products."
+>
+
+<section class="hero">
+
+  <div class="hero-content">
+
+    <span class="badge">
+      PREMIUM POD MARKETPLACE
+    </span>
+
+    <h1>
+      Discover Modern
+      <br />
+      Print-On-Demand Designs
+    </h1>
+
+    <p>
+      Ultra fast Astro ecommerce storefront with
+      modern UI, responsive layouts, and SEO
+      optimized architecture.
+    </p>
+
+  </div>
+
+</section>
+
+<section class="products-section">
+
+  <div class="section-head">
+
+    <div>
+
+      <h2>
+        Featured Products
+      </h2>
+
+      <p>
+        Trending marketplace designs
+      </p>
+
+    </div>
+
+    <div class="filters">
+
+      <button class="active">
+        Trending
+      </button>
+
+      <button>
+        Latest
+      </button>
+
+      <button>
+        Popular
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="products-grid">
+
+    {
+      featuredProducts.map(product => (
+
+        <a
+          href={`/product/${product.slug}`}
+          class="card"
+        >
+
+          <div class="card-image">
+
+            <img
+              src={product.displayImage}
+              alt={product.data.title}
+              loading="lazy"
+            />
+
+          </div>
+
+          <div class="card-body">
+
+            <div class="card-top">
+
+              <span class="tag">
+                FEATURED
+              </span>
+
+              <span class="category">
+                {product.data.category}
+              </span>
+
+            </div>
+
+            <h2>
+              {product.data.title}
+            </h2>
+
+            <p class="desc">
+              {product.data.description}
+            </p>
+
+            <div class="price-wrap">
+
+              <span class="price">
+                {product.data.price}
+              </span>
+
+              {
+                product.data.oldPrice && (
+                  <span class="old-price">
+                    {product.data.oldPrice}
+                  </span>
+                )
+              }
+
+            </div>
+
+          </div>
+
+        </a>
+
+      ))
+    }
+
+  </div>
+
+</section>
+<style is:global>
+.hero{
+  position:relative;
+  overflow:hidden;
+  border-radius:var(--radius-lg);
+  padding:90px 50px;
+  margin-bottom:60px;
+  background:
+    radial-gradient(
+      circle at top right,
+      color-mix(in srgb,var(--primary) 20%,transparent),
+      transparent 35%
+    ),
+    var(--surface);
+  color:var(--text);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(
+      circle at 80% 20%,
+      color-mix(in srgb,var(--primary) 10%,transparent),
+      transparent 40%
+    );
+  pointer-events:none;
+}
+
+.hero-content{
+  position:relative;
+  z-index:2;
+  max-width:720px;
+}
+
+.badge{
+  display:inline-flex;
+  padding:10px 16px;
+  border-radius:999px;
+  background:var(--surface-hover);
+  border:1px solid var(--border);
+  color:var(--primary);
+  font-size:13px;
+  font-weight:800;
+  margin-bottom:20px;
+}
+
+.hero h1{
+  color:var(--text);
+  font-size:68px;
+  line-height:1;
+  margin-bottom:24px;
+}
+
+.hero p{
+  color:var(--text-secondary);
+  font-size:18px;
+  line-height:1.9;
+}
+
+.products-section{
+  margin-top:30px;
+}
+
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:34px;
+}
+
+.section-head h2{
+  color:var(--text);
+  font-size:42px;
+  margin-bottom:6px;
+}
+
+.section-head p{
+  color:var(--text-secondary);
+}
+
+.filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+.filters button{
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--text);
+  padding:12px 18px;
+  border-radius:var(--radius);
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition),
+    transform var(--transition);
+}
+
+.filters button:hover{
+  background:var(--surface-hover);
+  border-color:var(--primary);
+}
+
+.filters .active{
+  background:var(--bgbtn);
+  color:var(--textbtn);
+  border-color:transparent;
+}
+
+.products-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:24px;
+}
+
+.card{
+  display:block;
+  background:var(--surface);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  transition:
+    transform var(--transition),
+    border-color var(--transition),
+    background var(--transition),
+    box-shadow var(--transition);
+}
+
+.card:hover{
+  transform:translateY(-6px);
+  border-color:var(--primary);
+}
+
+.card-image{
+  overflow:hidden;
+  background:var(--surface-hover);
+}
+
+.card-image img{
+  display:block;
+  width:100%;
+  height:360px;
+  object-fit:cover;
+  transition:transform .4s ease;
+}
+
+.card:hover img{
+  transform:scale(1.05);
+}
+
+.card-body{
+  padding:22px;
+  background:var(--surface);
+}
+
+.card-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.tag{
+  display:inline-flex;
+  background:
+    color-mix(
+      in srgb,
+      var(--primary) 10%,
+      var(--surface)
+    );
+  color:var(--primary);
+  padding:8px 12px;
+  border:1px solid
+    color-mix(
+      in srgb,
+      var(--primary) 20%,
+      var(--border)
+    );
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.category{
+  color:var(--text-secondary);
+  font-size:13px;
+  font-weight:700;
+}
+
+.card h2{
+  color:var(--text);
+  font-size:22px;
+  line-height:1.3;
+  margin-bottom:12px;
+}
+
+.desc{
+  color:var(--text-secondary);
+  line-height:1.8;
+  margin-bottom:18px;
+  font-size:15px;
+}
+
+.price-wrap{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.price{
+  color:var(--text);
+  font-size:28px;
+  font-weight:900;
+}
+
+.old-price{
+  color:var(--text-secondary);
+  text-decoration:line-through;
+  opacity:.7;
+}
+
+@media(max-width:1200px){
+
+  .products-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .hero h1{
+    font-size:54px;
+  }
+
+}
+
+@media(max-width:768px){
+
+  .hero{
+    padding:60px 24px;
+  }
+
+  .hero h1{
+    font-size:40px;
+  }
+
+  .hero p{
+    font-size:16px;
+  }
+
+  .section-head{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .section-head h2{
+    font-size:34px;
+  }
+
+  .products-grid{
+    grid-template-columns:1fr;
+  }
+
+  .card-image img{
+    height:320px;
+  }
+
+}
+</style>
+</MainLayout>

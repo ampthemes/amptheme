@@ -1,0 +1,1195 @@
+---
+import MainLayout from "../../../layouts/MainLayout.astro";
+
+const whatsappNumber = "6281234567890";
+---
+
+<MainLayout
+  title="Pembayaran Berhasil | AI Mr Ferdy"
+  description="Pembayaran dan pesanan Anda berhasil diproses."
+  canonical="/product/checkout/success/"
+>
+
+  <main class="success-page">
+
+    <section class="success-card">
+
+      <!-- SUCCESS ICON -->
+      <div class="success-icon" aria-hidden="true">
+
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+
+      </div>
+
+
+      <!-- LABEL -->
+      <span class="success-label">
+        PAYMENT SUCCESS
+      </span>
+
+
+      <!-- TITLE -->
+      <h1>
+        Pembayaran Berhasil
+      </h1>
+
+
+      <p class="success-description">
+        Terima kasih. Pesanan kamu berhasil dibuat.
+        Detail pesanan telah disiapkan untuk dikirim melalui WhatsApp.
+      </p>
+
+
+      <!-- ORDER INFORMATION -->
+      <div class="order-box">
+
+        <div class="order-row">
+
+          <span>
+            Order ID
+          </span>
+
+          <strong id="orderId">
+            -
+          </strong>
+
+        </div>
+
+
+        <div class="order-row">
+
+          <span>
+            Status
+          </span>
+
+          <strong class="status">
+            Pembayaran Berhasil
+          </strong>
+
+        </div>
+
+
+        <div class="order-row">
+
+          <span>
+            Total
+          </span>
+
+          <strong id="orderTotal">
+            -
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- ORDER DETAILS -->
+      <div class="details-box">
+
+        <div class="details-header">
+          <span>
+            Detail Pesanan
+          </span>
+        </div>
+
+
+        <div
+          class="order-items"
+          id="orderItems"
+        >
+
+          <div class="empty-order">
+            Memuat detail pesanan...
+          </div>
+
+        </div>
+
+
+        <div class="details-total">
+
+          <span>
+            Total
+          </span>
+
+          <strong id="detailsTotal">
+            -
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- REDIRECT MESSAGE -->
+      <div class="redirect-message">
+
+        <span>
+          Anda akan diarahkan ke WhatsApp dalam
+        </span>
+
+        <strong id="countdown">
+          3
+        </strong>
+
+        <span>
+          detik...
+        </span>
+
+      </div>
+
+
+      <!-- WHATSAPP BUTTON -->
+      <a
+        id="whatsappLink"
+        href="#"
+        class="whatsapp-btn"
+      >
+
+        <svg
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path d="M20.52 3.48A11.82 11.82 0 0 0 12.08 0C5.55 0 .23 5.32.23 11.85c0 2.09.55 4.13 1.6 5.93L.13 24l6.36-1.67a11.83 11.83 0 0 0 5.59 1.41h.01c6.53 0 11.85-5.32 11.85-11.85 0-3.17-1.23-6.15-3.42-8.41ZM12.09 21.7h-.01a9.82 9.82 0 0 1-5.01-1.37l-.36-.21-3.77.99 1.01-3.67-.23-.38a9.82 9.82 0 0 1-1.51-5.21C2.21 6.43 6.64 2 12.09 2c2.64 0 5.12 1.03 6.99 2.9a9.82 9.82 0 0 1 2.89 6.99c0 5.45-4.43 9.88-9.88 9.88Zm5.42-7.4c-.3-.15-1.77-.87-2.05-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.76-1.67-2.06-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.49s1.07 2.89 1.22 3.09c.15.2 2.1 3.21 5.08 4.5.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35Z"/>
+        </svg>
+
+        Lanjut ke WhatsApp
+
+      </a>
+
+
+      <!-- HOME -->
+      <a
+        href="/"
+        class="home-link"
+      >
+        Kembali ke Home
+      </a>
+
+    </section>
+
+  </main>
+
+</MainLayout>
+
+
+<script define:vars={{ whatsappNumber }}>
+
+  /*
+   * ============================================
+   * GET CHECKOUT ORDER
+   * ============================================
+   */
+
+  let order = null;
+
+  try {
+
+    order = JSON.parse(
+      sessionStorage.getItem(
+        "checkoutOrder"
+      ) || "null"
+    );
+
+  } catch {
+
+    order = null;
+
+  }
+
+
+  /*
+   * ============================================
+   * ELEMENTS
+   * ============================================
+   */
+
+  const orderIdElement =
+    document.querySelector(
+      "#orderId"
+    );
+
+  const orderTotalElement =
+    document.querySelector(
+      "#orderTotal"
+    );
+
+  const detailsTotalElement =
+    document.querySelector(
+      "#detailsTotal"
+    );
+
+  const orderItemsElement =
+    document.querySelector(
+      "#orderItems"
+    );
+
+  const whatsappLink =
+    document.querySelector(
+      "#whatsappLink"
+    );
+
+  const countdownElement =
+    document.querySelector(
+      "#countdown"
+    );
+
+
+  /*
+   * ============================================
+   * FORMAT PRICE
+   * ============================================
+   */
+
+  function formatPrice(value) {
+
+    const number =
+      Number(value || 0);
+
+    return (
+      "Rp " +
+      number.toLocaleString(
+        "id-ID"
+      )
+    );
+
+  }
+
+
+  /*
+   * ============================================
+   * ORDER DATA
+   * ============================================
+   */
+
+  const orderId =
+    order?.orderId ||
+    "Tidak tersedia";
+
+
+  const items =
+    Array.isArray(order?.items)
+      ? order.items
+      : [];
+
+
+  /*
+   * ============================================
+   * TOTAL
+   * ============================================
+   */
+
+  let calculatedTotal = 0;
+
+
+  items.forEach((item) => {
+
+    const quantity =
+      Math.max(
+        1,
+        Number(
+          item.quantity || 1
+        )
+      );
+
+    const price =
+      Number(
+        item.price || 0
+      );
+
+    calculatedTotal +=
+      price * quantity;
+
+  });
+
+
+  const total =
+    Number(order?.totalValue) ||
+    calculatedTotal;
+
+
+  /*
+   * ============================================
+   * DISPLAY ORDER ID
+   * ============================================
+   */
+
+  if (orderIdElement) {
+
+    orderIdElement.textContent =
+      orderId;
+
+  }
+
+
+  /*
+   * ============================================
+   * DISPLAY TOTAL
+   * ============================================
+   */
+
+  if (orderTotalElement) {
+
+    orderTotalElement.textContent =
+      formatPrice(total);
+
+  }
+
+
+  if (detailsTotalElement) {
+
+    detailsTotalElement.textContent =
+      formatPrice(total);
+
+  }
+
+
+  /*
+   * ============================================
+   * DISPLAY PRODUCTS
+   * ============================================
+   */
+
+  if (
+    orderItemsElement &&
+    items.length
+  ) {
+
+    orderItemsElement.innerHTML =
+      items.map(
+        (item, index) => {
+
+          const quantity =
+            Math.max(
+              1,
+              Number(
+                item.quantity || 1
+              )
+            );
+
+          const price =
+            Number(
+              item.price || 0
+            );
+
+          const subtotal =
+            price * quantity;
+
+          return `
+            <div class="order-item">
+
+              <div class="item-number">
+                ${index + 1}
+              </div>
+
+              <div class="item-info">
+
+                <strong>
+                  ${escapeHtml(
+                    item.title ||
+                    "Produk"
+                  )}
+                </strong>
+
+                <span>
+                  Qty ${quantity}
+                  ×
+                  ${formatPrice(price)}
+                </span>
+
+              </div>
+
+              <div class="item-subtotal">
+                ${formatPrice(
+                  subtotal
+                )}
+              </div>
+
+            </div>
+          `;
+
+        }
+      ).join("");
+
+  } else if (orderItemsElement) {
+
+    orderItemsElement.innerHTML = `
+      <div class="empty-order">
+        Detail pesanan tidak tersedia.
+      </div>
+    `;
+
+  }
+
+
+  /*
+   * ============================================
+   * ESCAPE HTML
+   * ============================================
+   */
+
+  function escapeHtml(value) {
+
+    return String(value)
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+      .replace(
+        /</g,
+        "&lt;"
+      )
+      .replace(
+        />/g,
+        "&gt;"
+      )
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+      .replace(
+        /'/g,
+        "&#039;"
+      );
+
+  }
+
+
+  /*
+   * ============================================
+   * WHATSAPP MESSAGE
+   * ============================================
+   */
+
+  let detailPesanan = "";
+
+
+  if (items.length) {
+
+    items.forEach(
+      (item, index) => {
+
+        const quantity =
+          Math.max(
+            1,
+            Number(
+              item.quantity || 1
+            )
+          );
+
+        const price =
+          Number(
+            item.price || 0
+          );
+
+        const subtotal =
+          price * quantity;
+
+
+        detailPesanan +=
+`${index + 1}. ${item.title || "Produk"}
+   Qty: ${quantity}
+   Harga: ${formatPrice(price)}
+   Subtotal: ${formatPrice(subtotal)}
+
+`;
+
+      }
+    );
+
+  } else {
+
+    detailPesanan =
+      "Detail produk tidak tersedia.\n\n";
+
+  }
+
+
+  const message =
+`Halo AI Mr Ferdy,
+
+Saya ingin mengonfirmasi pesanan saya.
+
+Order ID: ${orderId}
+
+Detail Pesanan:
+${detailPesanan}Total: ${formatPrice(total)}
+
+Pembayaran sudah berhasil dilakukan.
+
+Mohon diproses.
+
+Terima kasih.`;
+
+
+  /*
+   * ============================================
+   * WHATSAPP URL
+   * ============================================
+   */
+
+  const whatsappUrl =
+    `https://wa.me/${whatsappNumber}?text=${
+      encodeURIComponent(
+        message
+      )
+    }`;
+
+
+  /*
+   * ============================================
+   * SET WHATSAPP BUTTON
+   * ============================================
+   */
+
+  if (whatsappLink) {
+
+    whatsappLink.href =
+      whatsappUrl;
+
+  }
+
+
+  /*
+   * ============================================
+   * COUNTDOWN
+   * ============================================
+   */
+
+  let seconds = 3;
+
+
+  const timer =
+    setInterval(
+      () => {
+
+        seconds--;
+
+
+        if (countdownElement) {
+
+          countdownElement.textContent =
+            String(seconds);
+
+        }
+
+
+        if (seconds <= 0) {
+
+          clearInterval(
+            timer
+          );
+
+
+          window.location.href =
+            whatsappUrl;
+
+        }
+
+      },
+      1000
+    );
+
+</script>
+
+
+<style is:global>
+
+.success-page{
+  width:min(100% - 24px, 760px);
+  min-height:calc(100vh - 180px);
+
+  margin:0 auto;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:50px 0;
+}
+
+
+/* ============================================
+   CARD
+============================================ */
+
+.success-card{
+  width:100%;
+
+  padding:45px 32px;
+
+  text-align:center;
+
+  background:var(--surface);
+
+  border:1px solid var(--border);
+
+  border-radius:var(--radius-lg);
+
+  box-shadow:var(--shadow);
+
+  position:relative;
+
+  overflow:hidden;
+}
+
+
+.success-card::before{
+  content:"";
+
+  position:absolute;
+
+  top:0;
+  left:0;
+  right:0;
+
+  height:3px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--primary),
+      transparent
+    );
+}
+
+
+/* ============================================
+   ICON
+============================================ */
+
+.success-icon{
+  width:76px;
+  height:76px;
+
+  margin:0 auto 20px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:50%;
+
+  color:var(--primary);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--primary) 10%,
+      transparent
+    );
+
+  border:1px solid
+    color-mix(
+      in srgb,
+      var(--primary) 25%,
+      transparent
+    );
+}
+
+
+.success-icon svg{
+  width:38px;
+  height:38px;
+}
+
+
+/* ============================================
+   TITLE
+============================================ */
+
+.success-label{
+  display:block;
+
+  margin-bottom:9px;
+
+  color:var(--primary);
+
+  font-size:11px;
+
+  font-weight:800;
+
+  letter-spacing:1.7px;
+}
+
+
+.success-card h1{
+  margin:0;
+
+  color:var(--text);
+
+  font-size:
+    clamp(
+      28px,
+      5vw,
+      42px
+    );
+
+  line-height:1.15;
+
+  letter-spacing:-1px;
+}
+
+
+.success-description{
+  max-width:570px;
+
+  margin:16px auto 28px;
+
+  color:var(--text-secondary);
+
+  font-size:14px;
+
+  line-height:1.8;
+}
+
+
+/* ============================================
+   ORDER BOX
+============================================ */
+
+.order-box{
+  max-width:540px;
+
+  margin:0 auto;
+
+  padding:5px 18px;
+
+  text-align:left;
+
+  background:var(--surface-hover);
+
+  border:1px solid var(--border);
+
+  border-radius:var(--radius);
+}
+
+
+.order-row{
+  min-height:52px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:20px;
+
+  border-bottom:1px solid var(--border);
+
+  font-size:13px;
+}
+
+
+.order-row:last-child{
+  border-bottom:0;
+}
+
+
+.order-row span{
+  color:var(--text-secondary);
+}
+
+
+.order-row strong{
+  color:var(--text);
+
+  font-weight:700;
+
+  text-align:right;
+}
+
+
+.order-row .status{
+  color:var(--primary);
+}
+
+
+/* ============================================
+   DETAILS
+============================================ */
+
+.details-box{
+  max-width:540px;
+
+  margin:18px auto 0;
+
+  overflow:hidden;
+
+  text-align:left;
+
+  background:var(--surface);
+
+  border:1px solid var(--border);
+
+  border-radius:var(--radius);
+}
+
+
+.details-header{
+  padding:14px 16px;
+
+  background:var(--surface-hover);
+
+  border-bottom:1px solid var(--border);
+
+  color:var(--text);
+
+  font-size:12px;
+
+  font-weight:800;
+
+  text-transform:uppercase;
+
+  letter-spacing:.7px;
+}
+
+
+.order-items{
+  padding:5px 16px;
+}
+
+
+.order-item{
+  display:grid;
+
+  grid-template-columns:30px minmax(0,1fr) auto;
+
+  align-items:center;
+
+  gap:10px;
+
+  padding:14px 0;
+
+  border-bottom:1px solid var(--border);
+}
+
+
+.order-item:last-child{
+  border-bottom:0;
+}
+
+
+.item-number{
+  width:26px;
+  height:26px;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  border-radius:50%;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--primary) 10%,
+      transparent
+    );
+
+  color:var(--primary);
+
+  font-size:11px;
+
+  font-weight:800;
+}
+
+
+.item-info{
+  min-width:0;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:4px;
+}
+
+
+.item-info strong{
+  overflow:hidden;
+
+  color:var(--text);
+
+  font-size:13px;
+
+  text-overflow:ellipsis;
+
+  white-space:nowrap;
+}
+
+
+.item-info span{
+  color:var(--text-secondary);
+
+  font-size:11px;
+}
+
+
+.item-subtotal{
+  color:var(--text);
+
+  font-size:12px;
+
+  font-weight:800;
+
+  white-space:nowrap;
+}
+
+
+.empty-order{
+  padding:20px 0;
+
+  color:var(--text-secondary);
+
+  text-align:center;
+
+  font-size:12px;
+}
+
+
+/* ============================================
+   TOTAL
+============================================ */
+
+.details-total{
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  padding:16px;
+
+  border-top:1px solid var(--border);
+
+  background:var(--surface-hover);
+}
+
+
+.details-total span{
+  color:var(--text-secondary);
+
+  font-size:13px;
+}
+
+
+.details-total strong{
+  color:var(--text);
+
+  font-size:17px;
+
+  font-weight:900;
+}
+
+
+/* ============================================
+   REDIRECT
+============================================ */
+
+.redirect-message{
+  margin-top:24px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:5px;
+
+  color:var(--text-secondary);
+
+  font-size:12px;
+
+  line-height:1.6;
+}
+
+
+.redirect-message strong{
+  min-width:20px;
+
+  color:var(--primary);
+
+  font-size:15px;
+
+  text-align:center;
+}
+
+
+/* ============================================
+   WHATSAPP
+============================================ */
+
+.whatsapp-btn{
+  min-height:50px;
+
+  margin-top:18px;
+
+  padding:0 25px;
+
+  display:inline-flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:9px;
+
+  border-radius:10px;
+
+  background:var(--bgbtn);
+
+  color:var(--textbtn);
+
+  font-size:13px;
+
+  font-weight:700;
+
+  text-decoration:none;
+
+  transition:
+    transform .2s ease,
+    filter .2s ease;
+}
+
+
+.whatsapp-btn svg{
+  width:19px;
+  height:19px;
+}
+
+
+.whatsapp-btn:hover{
+  transform:translateY(-1px);
+
+  filter:brightness(1.08);
+}
+
+
+/* ============================================
+   HOME
+============================================ */
+
+.home-link{
+  display:block;
+
+  margin-top:17px;
+
+  color:var(--text-secondary);
+
+  font-size:12px;
+
+  text-decoration:none;
+}
+
+
+.home-link:hover{
+  color:var(--primary);
+}
+
+
+/* ============================================
+   MOBILE
+============================================ */
+
+@media(max-width:600px){
+
+  .success-page{
+    width:calc(100% - 24px);
+
+    min-height:calc(100vh - 140px);
+
+    padding:30px 0;
+  }
+
+
+  .success-card{
+    padding:34px 16px;
+  }
+
+
+  .success-icon{
+    width:68px;
+    height:68px;
+  }
+
+
+  .success-icon svg{
+    width:34px;
+    height:34px;
+  }
+
+
+  .order-box{
+    padding:4px 14px;
+  }
+
+
+  .order-row{
+    gap:12px;
+
+    font-size:12px;
+  }
+
+
+  .details-box{
+    margin-top:15px;
+  }
+
+
+  .order-items{
+    padding:4px 12px;
+  }
+
+
+  .order-item{
+    grid-template-columns:26px minmax(0,1fr);
+
+    gap:9px;
+  }
+
+
+  .item-subtotal{
+    grid-column:2;
+
+    margin-top:-5px;
+
+    font-size:11px;
+  }
+
+
+  .item-info strong{
+    font-size:12px;
+  }
+
+
+  .redirect-message{
+    flex-wrap:wrap;
+
+    margin-top:20px;
+  }
+
+
+  .whatsapp-btn{
+    width:100%;
+
+    box-sizing:border-box;
+  }
+
+}
+
+</style>

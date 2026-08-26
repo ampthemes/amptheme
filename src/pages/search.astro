@@ -1,0 +1,1782 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import { getCollection } from "astro:content";
+import fs from "node:fs";
+import path from "node:path";
+
+interface Tool {
+  title: string;
+  description: string;
+  url: string;
+}
+
+interface Blog {
+  title: string;
+  description: string;
+  url: string;
+}
+
+interface Product {
+  title: string;
+  description: string;
+  url: string;
+}
+
+
+/* =========================================================
+   CONTENT COLLECTION
+========================================================= */
+
+const posts =
+  await getCollection("blog");
+
+const products =
+  await getCollection("product");
+
+
+/* =========================================================
+   TOOLS DIRECTORY
+========================================================= */
+
+const toolsDir =
+  path.resolve("./src/pages/tools");
+
+
+/* =========================================================
+   SCAN SEMUA FILE ASTRO
+========================================================= */
+
+function getAstroFiles(
+  dir: string
+): string[] {
+
+  if (!fs.existsSync(dir)) {
+    return [];
+  }
+
+  const entries =
+    fs.readdirSync(
+      dir,
+      {
+        withFileTypes: true
+      }
+    );
+
+  const files: string[] = [];
+
+  for (const entry of entries) {
+
+    const fullPath =
+      path.join(
+        dir,
+        entry.name
+      );
+
+    if (entry.isDirectory()) {
+
+      files.push(
+        ...getAstroFiles(
+          fullPath
+        )
+      );
+
+    } else if (
+      entry.name.endsWith(".astro")
+    ) {
+
+      files.push(
+        fullPath
+      );
+
+    }
+
+  }
+
+  return files;
+
+}
+
+
+/* =========================================================
+   EXTRACT TITLE / DESCRIPTION
+========================================================= */
+
+function extractValue(
+  content: string,
+  name: string
+): string {
+
+  const patterns = [
+
+    new RegExp(
+      `(?:const|let|var)\\s+${name}\\s*=\\s*["'\`]([^"'\\\`]+)["'\`]`,
+      "m"
+    ),
+
+    new RegExp(
+      `${name}\\s*:\\s*["'\`]([^"'\\\`]+)["'\`]`,
+      "m"
+    ),
+
+    new RegExp(
+      `${name}\\s*=\\s*["'\`]([^"'\\\`]+)["'\`]`,
+      "m"
+    )
+
+  ];
+
+  for (
+    const regex of patterns
+  ) {
+
+    const match =
+      content.match(regex);
+
+    if (match?.[1]) {
+
+      return match[1].trim();
+
+    }
+
+  }
+
+  return "";
+
+}
+
+
+/* =========================================================
+   CREATE TOOL URL
+========================================================= */
+
+function createToolUrl(
+  file: string
+): string {
+
+  let relative =
+    path.relative(
+      toolsDir,
+      file
+    );
+
+  relative =
+    relative
+      .replace(
+        /\\/g,
+        "/"
+      )
+      .replace(
+        /\.astro$/,
+        ""
+      );
+
+  if (
+    relative.endsWith("/index")
+  ) {
+
+    relative =
+      relative.slice(
+        0,
+        -6
+      );
+
+  }
+
+  return `/tools/${relative}`;
+
+}
+
+
+/* =========================================================
+   READ ALL TOOLS
+========================================================= */
+
+const files =
+  getAstroFiles(
+    toolsDir
+  );
+
+
+const tools: Tool[] =
+  files
+
+    .map(
+      (file) => {
+
+        const content =
+          fs.readFileSync(
+            file,
+            "utf8"
+          );
+
+        const title =
+          extractValue(
+            content,
+            "title"
+          );
+
+        const description =
+          extractValue(
+            content,
+            "description"
+          );
+
+        return {
+
+          title,
+
+          description,
+
+          url:
+            createToolUrl(
+              file
+            )
+
+        };
+
+      }
+    )
+
+    .filter(
+      (tool) =>
+        tool.title
+    )
+
+    .sort(
+      (a, b) =>
+        a.title.localeCompare(
+          b.title
+        )
+    );
+
+
+/* =========================================================
+   BLOG DATA
+========================================================= */
+
+const blogs: Blog[] =
+  posts
+
+    .map(
+      (post) => ({
+
+        title:
+          post.data.title,
+
+        description:
+          post.data.description || "",
+
+        url:
+          `/blog/${post.slug}/`
+
+      })
+    )
+
+    .filter(
+      (post) =>
+        post.title
+    );
+
+
+/* =========================================================
+   PRODUCT DATA
+========================================================= */
+
+const productItems: Product[] =
+  products
+
+    .map(
+      (product) => ({
+
+        title:
+          product.data.title,
+
+        description:
+          product.data.description || "",
+
+        url:
+          `/product/${product.slug}/`
+
+      })
+    )
+
+    .filter(
+      (product) =>
+        product.title
+    );
+
+---
+
+<MainLayout
+  title="Pencarian | AI Mr Ferdy"
+  description="Cari tools, artikel, dan produk AI Mr Ferdy berdasarkan judul dan deskripsi."
+>
+
+  <section class="search-section">
+
+    <div class="search-container">
+
+      <!-- =================================================
+           HEADER
+      ================================================== -->
+
+      <header class="search-header">
+
+        <span class="search-label">
+          SEARCH
+        </span>
+
+        <h1>
+          Pencarian AI Mr Ferdy
+        </h1>
+
+        <p class="search-description">
+          Cari tools, artikel, atau produk berdasarkan
+          nama dan deskripsi.
+        </p>
+
+      </header>
+
+
+      <!-- =================================================
+           SEARCH FORM
+      ================================================== -->
+
+      <form
+        id="searchForm"
+        class="search-form"
+      >
+
+        <div class="search-input-wrap">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+
+            <circle
+              cx="11"
+              cy="11"
+              r="7"
+            />
+
+            <path
+              d="m20 20-4-4"
+            />
+
+          </svg>
+
+          <input
+            type="search"
+            id="searchInput"
+            placeholder="Cari tools, artikel, atau produk..."
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Cari"
+          />
+
+        </div>
+
+
+        <select
+          id="searchType"
+          aria-label="Jenis pencarian"
+        >
+
+          <option value="all">
+            Semua
+          </option>
+
+          <option value="tool">
+            Tools
+          </option>
+
+          <option value="blog">
+            Blog
+          </option>
+
+          <option value="product">
+            Product
+          </option>
+
+        </select>
+
+
+        <button
+          type="submit"
+          id="searchButton"
+          class="search-button"
+        >
+          Search
+        </button>
+
+      </form>
+
+
+      <!-- =================================================
+           RESULT INFO
+      ================================================== -->
+
+      <div
+        id="searchInfo"
+        class="search-info"
+      ></div>
+
+
+      <!-- =================================================
+           RESULTS
+      ================================================== -->
+
+      <div
+        id="searchResults"
+        class="result-grid"
+      ></div>
+
+
+      <!-- =================================================
+           EMPTY
+      ================================================== -->
+
+      <div
+        id="emptySearch"
+        class="empty-search"
+      >
+
+        <div class="empty-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+
+            <circle
+              cx="11"
+              cy="11"
+              r="7"
+            />
+
+            <path
+              d="m20 20-4-4"
+            />
+
+          </svg>
+
+        </div>
+
+        <h2>
+          Cari sesuatu
+        </h2>
+
+        <p>
+          Masukkan kata kunci untuk mencari
+          tools, artikel, atau produk.
+        </p>
+
+      </div>
+
+
+      <!-- =================================================
+           NO RESULT
+      ================================================== -->
+
+      <div
+        id="noResults"
+        class="no-results"
+      >
+
+        <div class="empty-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+
+            <circle
+              cx="11"
+              cy="11"
+              r="7"
+            />
+
+            <path
+              d="m20 20-4-4"
+            />
+
+          </svg>
+
+        </div>
+
+        <h2>
+          Tidak ada hasil
+        </h2>
+
+        <p>
+          Coba gunakan kata kunci lain atau
+          ubah kategori pencarian.
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</MainLayout>
+
+
+<script
+  define:vars={{
+    tools,
+    blogs,
+    productItems
+  }}
+>
+
+  /* =======================================================
+     ELEMENTS
+  ======================================================== */
+
+  const form =
+    document.querySelector(
+      "#searchForm"
+    );
+
+  const input =
+    document.querySelector(
+      "#searchInput"
+    );
+
+  const type =
+    document.querySelector(
+      "#searchType"
+    );
+
+  const results =
+    document.querySelector(
+      "#searchResults"
+    );
+
+  const info =
+    document.querySelector(
+      "#searchInfo"
+    );
+
+  const empty =
+    document.querySelector(
+      "#emptySearch"
+    );
+
+  const noResults =
+    document.querySelector(
+      "#noResults"
+    );
+
+
+  /* =======================================================
+     ESCAPE HTML
+  ======================================================== */
+
+  function escapeHTML(
+    value
+  ) {
+
+    return String(value)
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+      .replace(
+        /</g,
+        "&lt;"
+      )
+      .replace(
+        />/g,
+        "&gt;"
+      )
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+      .replace(
+        /'/g,
+        "&#039;"
+      );
+
+  }
+
+
+  /* =======================================================
+     GET SEARCH DATA
+  ======================================================== */
+
+  function getSearchData() {
+
+    const selectedType =
+      type.value;
+
+
+    const toolData =
+      tools.map(
+        tool => ({
+
+          title:
+            tool.title,
+
+          description:
+            tool.description,
+
+          url:
+            tool.url,
+
+          type:
+            "tool"
+
+        })
+      );
+
+
+    const blogData =
+      blogs.map(
+        blog => ({
+
+          title:
+            blog.title,
+
+          description:
+            blog.description,
+
+          url:
+            blog.url,
+
+          type:
+            "blog"
+
+        })
+      );
+
+
+    const productData =
+      productItems.map(
+        product => ({
+
+          title:
+            product.title,
+
+          description:
+            product.description,
+
+          url:
+            product.url,
+
+          type:
+            "product"
+
+        })
+      );
+
+
+    if (
+      selectedType === "tool"
+    ) {
+
+      return toolData;
+
+    }
+
+
+    if (
+      selectedType === "blog"
+    ) {
+
+      return blogData;
+
+    }
+
+
+    if (
+      selectedType === "product"
+    ) {
+
+      return productData;
+
+    }
+
+
+    return [
+
+      ...toolData,
+
+      ...blogData,
+
+      ...productData
+
+    ];
+
+  }
+
+
+  /* =======================================================
+     SEARCH
+  ======================================================== */
+
+  function searchItems() {
+
+    const keyword =
+      input.value
+        .trim()
+        .toLowerCase();
+
+
+    if (!keyword) {
+
+      results.innerHTML =
+        "";
+
+      info.textContent =
+        "";
+
+      empty.style.display =
+        "block";
+
+      noResults.style.display =
+        "none";
+
+      return;
+
+    }
+
+
+    const data =
+      getSearchData();
+
+
+    const found =
+      data.filter(
+        item => {
+
+          const title =
+            (
+              item.title || ""
+            )
+              .toLowerCase();
+
+
+          const description =
+            (
+              item.description || ""
+            )
+              .toLowerCase();
+
+
+          return (
+            title.includes(
+              keyword
+            ) ||
+            description.includes(
+              keyword
+            )
+          );
+
+        }
+      );
+
+
+    empty.style.display =
+      "none";
+
+
+    let label =
+      "hasil";
+
+
+    if (
+      type.value === "tool"
+    ) {
+
+      label =
+        "tools";
+
+    }
+
+    else if (
+      type.value === "blog"
+    ) {
+
+      label =
+        "artikel";
+
+    }
+
+    else if (
+      type.value === "product"
+    ) {
+
+      label =
+        "product";
+
+    }
+
+
+    info.textContent =
+      `${found.length} ${label} ditemukan`;
+
+
+    if (
+      found.length === 0
+    ) {
+
+      results.innerHTML =
+        "";
+
+      noResults.style.display =
+        "block";
+
+      return;
+
+    }
+
+
+    noResults.style.display =
+      "none";
+
+
+    /* =====================================================
+       RENDER RESULT
+    ====================================================== */
+
+    results.innerHTML =
+      found
+        .map(
+          item => {
+
+            let badge =
+              "Blog";
+
+
+            if (
+              item.type === "tool"
+            ) {
+
+              badge =
+                "Tool";
+
+            }
+
+            else if (
+              item.type === "product"
+            ) {
+
+              badge =
+                "Product";
+
+            }
+
+
+            return `
+
+              <a
+                class="result-card"
+                href="${escapeHTML(
+                  item.url
+                )}"
+              >
+
+                <span
+                  class="result-badge"
+                >
+                  ${badge}
+                </span>
+
+                <h2>
+                  ${escapeHTML(
+                    item.title
+                  )}
+                </h2>
+
+                ${
+                  item.description
+                    ? `
+                      <p>
+                        ${escapeHTML(
+                          item.description
+                        )}
+                      </p>
+                    `
+                    : ""
+                }
+
+              </a>
+
+            `;
+
+          }
+        )
+        .join("");
+
+  }
+
+
+  /* =======================================================
+     UPDATE URL
+  ======================================================== */
+
+  function updateURL() {
+
+    const keyword =
+      input.value.trim();
+
+
+    const selectedType =
+      type.value;
+
+
+    const params =
+      new URLSearchParams();
+
+
+    if (keyword) {
+
+      params.set(
+        "q",
+        keyword
+      );
+
+    }
+
+
+    if (
+      selectedType !== "all"
+    ) {
+
+      params.set(
+        "type",
+        selectedType
+      );
+
+    }
+
+
+    const query =
+      params.toString();
+
+
+    const newURL =
+      query
+        ? `${location.pathname}?${query}`
+        : location.pathname;
+
+
+    history.replaceState(
+      {},
+      "",
+      newURL
+    );
+
+  }
+
+
+  /* =======================================================
+     ENTER + BUTTON SEARCH
+  ======================================================== */
+
+  form?.addEventListener(
+    "submit",
+    (event) => {
+
+      event.preventDefault();
+
+      searchItems();
+
+      updateURL();
+
+    }
+  );
+
+
+  /* =======================================================
+     FILTER CHANGE
+  ======================================================== */
+
+  type?.addEventListener(
+    "change",
+    () => {
+
+      if (
+        input.value.trim()
+      ) {
+
+        searchItems();
+
+      }
+
+      updateURL();
+
+    }
+  );
+
+
+  /* =======================================================
+     LOAD FROM URL
+  ======================================================== */
+
+  const params =
+    new URLSearchParams(
+      location.search
+    );
+
+
+  const urlKeyword =
+    params.get("q") || "";
+
+
+  const urlType =
+    params.get("type") || "all";
+
+
+  input.value =
+    urlKeyword;
+
+
+  if (
+    [
+      "all",
+      "tool",
+      "blog",
+      "product"
+    ].includes(urlType)
+  ) {
+
+    type.value =
+      urlType;
+
+  }
+
+
+  if (
+    urlKeyword.trim()
+  ) {
+
+    searchItems();
+
+  }
+
+</script>
+
+
+<style>
+
+/* =========================================================
+   SEARCH SECTION
+========================================================= */
+
+.search-section {
+
+  width:
+    100%;
+
+  padding:
+    60px 20px 90px;
+
+  box-sizing:
+    border-box;
+
+}
+
+
+.search-container {
+
+  width:
+    100%;
+
+  max-width:
+    1000px;
+
+  margin:
+    0 auto;
+
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.search-header {
+
+  margin-bottom:
+    28px;
+
+}
+
+
+.search-label {
+
+  display:
+    inline-block;
+
+  margin-bottom:
+    8px;
+
+  color:
+    var(--primary);
+
+  font-size:
+    10px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    1.6px;
+
+}
+
+
+.search-container h1 {
+
+  margin:
+    0;
+
+  text-align:
+    left;
+
+  color:
+    var(--text);
+
+  font-size:
+    clamp(
+      30px,
+      5vw,
+      42px
+    );
+
+  line-height:
+    1.15;
+
+  letter-spacing:
+    -1px;
+
+}
+
+
+.search-description {
+
+  margin:
+    10px 0 0;
+
+  color:
+    var(--text-secondary);
+
+  font-size:
+    14px;
+
+  line-height:
+    1.7;
+
+}
+
+
+/* =========================================================
+   SEARCH FORM
+========================================================= */
+
+.search-form {
+
+  display:
+    grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    150px
+    110px;
+
+  gap:
+    10px;
+
+  margin-bottom:
+    15px;
+
+}
+
+
+.search-input-wrap {
+
+  position:
+    relative;
+
+}
+
+
+.search-input-wrap svg {
+
+  position:
+    absolute;
+
+  top:
+    50%;
+
+  left:
+    14px;
+
+  width:
+    18px;
+
+  height:
+    18px;
+
+  transform:
+    translateY(-50%);
+
+  color:
+    var(--text-secondary);
+
+  pointer-events:
+    none;
+
+}
+
+
+.search-input-wrap input {
+
+  width:
+    100%;
+
+  height:
+    50px;
+
+  padding:
+    0 14px 0 43px;
+
+  box-sizing:
+    border-box;
+
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    10px;
+
+  outline:
+    none;
+
+  background:
+    var(--surface);
+
+  color:
+    var(--text);
+
+  font-family:
+    inherit;
+
+  font-size:
+    13px;
+
+}
+
+
+.search-form select {
+
+  width:
+    100%;
+
+  height:
+    50px;
+
+  padding:
+    0 12px;
+
+  box-sizing:
+    border-box;
+
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    10px;
+
+  outline:
+    none;
+
+  background:
+    var(--surface);
+
+  color:
+    var(--text);
+
+  font-family:
+    inherit;
+
+  font-size:
+    13px;
+
+}
+
+
+.search-input-wrap input:focus,
+.search-form select:focus {
+
+  border-color:
+    var(--primary);
+
+  box-shadow:
+    0 0 0 3px
+    color-mix(
+      in srgb,
+      var(--primary) 10%,
+      transparent
+    );
+
+}
+
+
+/* =========================================================
+   SEARCH BUTTON
+========================================================= */
+
+.search-button {
+
+  width:
+    100%;
+
+  height:
+    50px;
+
+  border:
+    0;
+
+  border-radius:
+    10px;
+
+  background:
+    var(--bgbtn);
+
+  color:
+    var(--textbtn);
+
+  font-family:
+    inherit;
+
+  font-size:
+    12px;
+
+  font-weight:
+    800;
+
+  cursor:
+    pointer;
+
+  transition:
+    transform .2s ease,
+    filter .2s ease;
+
+}
+
+
+.search-button:hover {
+
+  transform:
+    translateY(-1px);
+
+  filter:
+    brightness(1.08);
+
+}
+
+
+/* =========================================================
+   RESULT INFO
+========================================================= */
+
+.search-info {
+
+  min-height:
+    18px;
+
+  margin:
+    10px 0 15px;
+
+  color:
+    var(--text-secondary);
+
+  font-size:
+    12px;
+
+}
+
+
+/* =========================================================
+   RESULT GRID
+========================================================= */
+
+:global(.result-grid) {
+
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap:
+    14px;
+
+  width:
+    100%;
+
+}
+
+
+/* =========================================================
+   RESULT CARD
+========================================================= */
+
+:global(.result-card) {
+
+  display:
+    block;
+
+  width:
+    100%;
+
+  min-width:
+    0;
+
+  padding:
+    20px;
+
+  box-sizing:
+    border-box;
+
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    12px;
+
+  background:
+    var(--surface);
+
+  color:
+    var(--text);
+
+  text-decoration:
+    none;
+
+  box-shadow:
+    var(--shadow);
+
+  transition:
+    transform .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease;
+
+}
+
+
+:global(.result-card:hover) {
+
+  transform:
+    translateY(-2px);
+
+  border-color:
+    color-mix(
+      in srgb,
+      var(--primary) 45%,
+      var(--border)
+    );
+
+  box-shadow:
+    var(--shadow);
+
+}
+
+
+/* =========================================================
+   RESULT BADGE
+========================================================= */
+
+:global(.result-badge) {
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  min-height:
+    22px;
+
+  margin-bottom:
+    10px;
+
+  padding:
+    0 9px;
+
+  box-sizing:
+    border-box;
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--primary) 20%,
+      var(--border)
+    );
+
+  border-radius:
+    999px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--primary) 7%,
+      transparent
+    );
+
+  color:
+    var(--primary);
+
+  font-size:
+    9px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    .5px;
+
+  text-transform:
+    uppercase;
+
+}
+
+
+/* =========================================================
+   RESULT TITLE
+========================================================= */
+
+:global(.result-card h2) {
+
+  margin:
+    0 0 8px;
+
+  color:
+    var(--text);
+
+  font-size:
+    17px;
+
+  line-height:
+    1.4;
+
+}
+
+
+/* =========================================================
+   RESULT DESCRIPTION
+========================================================= */
+
+:global(.result-card p) {
+
+  margin:
+    0;
+
+  color:
+    var(--text-secondary);
+
+  font-size:
+    12px;
+
+  line-height:
+    1.65;
+
+}
+
+
+/* =========================================================
+   EMPTY / NO RESULT
+========================================================= */
+
+.empty-search,
+.no-results {
+
+  padding:
+    50px 20px;
+
+  text-align:
+    center;
+
+  border:
+    1px dashed var(--border);
+
+  border-radius:
+    14px;
+
+  background:
+    var(--surface);
+
+  color:
+    var(--text-secondary);
+
+}
+
+
+.empty-icon {
+
+  width:
+    52px;
+
+  height:
+    52px;
+
+  margin:
+    0 auto 15px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border-radius:
+    50%;
+
+  background:
+    var(--surface-hover);
+
+  color:
+    var(--text-secondary);
+
+}
+
+
+.empty-icon svg {
+
+  width:
+    24px;
+
+  height:
+    24px;
+
+}
+
+
+.empty-search h2,
+.no-results h2 {
+
+  margin:
+    0;
+
+  color:
+    var(--text);
+
+  font-size:
+    17px;
+
+}
+
+
+.empty-search p,
+.no-results p {
+
+  max-width:
+    430px;
+
+  margin:
+    8px auto 0;
+
+  color:
+    var(--text-secondary);
+
+  font-size:
+    12px;
+
+  line-height:
+    1.7;
+
+}
+
+
+.no-results {
+
+  display:
+    none;
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .search-section {
+
+    padding:
+      35px 15px 60px;
+
+  }
+
+
+  .search-container h1 {
+
+    font-size:
+      28px;
+
+  }
+
+
+  .search-form {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+
+  .search-button {
+
+    width:
+      100%;
+
+  }
+
+
+  :global(.result-grid) {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+
+  :global(.result-card) {
+
+    padding:
+      18px;
+
+  }
+
+}
+
+</style>

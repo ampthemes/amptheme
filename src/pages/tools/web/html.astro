@@ -1,0 +1,1482 @@
+---
+import MainLayout from "../../../layouts/MainLayout.astro";
+
+export const meta = {
+  title: "🗜️ UnJS Online Full HTML Cleaner",
+  description:
+    "Membersihkan JavaScript yang kemungkinan tidak digunakan tanpa merusak HTML dan CSS. Semua proses berjalan langsung di browser.",
+  category: "Web",
+  featured: true
+};
+---
+
+<MainLayout
+  title={`${meta.title} | AI Mr Ferdy`}
+  description={meta.description}
+  pageCSS={["tools"]}
+>
+
+  <div class="unjs-tool">
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <div class="unjs-tool__hero">
+
+      <span class="unjs-tool__label">
+        WEB TOOL
+      </span>
+
+      <h1 class="unjs-tool__title">
+        UnJS Online Full HTML Cleaner
+      </h1>
+
+      <p class="unjs-tool__description">
+        Membersihkan JavaScript yang kemungkinan tidak digunakan
+        tanpa merusak HTML dan CSS. Semua proses berjalan langsung
+        di browser.
+      </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         WARNING
+    ====================================================== -->
+
+    <div class="unjs-tool__warning">
+
+      <strong>Penting:</strong>
+
+      Fungsi JavaScript yang dipanggil secara dinamis,
+      melalui file eksternal, framework, atau event tertentu
+      dapat terbaca sebagai tidak digunakan.
+
+      Selalu cek hasil sebelum dipasang ke website.
+
+    </div>
+
+
+    <!-- =====================================================
+         TOOLBAR
+    ====================================================== -->
+
+    <div class="unjs-tool__toolbar">
+
+      <button
+        type="button"
+        class="unjs-tool__button unjs-tool__button--primary"
+        id="analyzeButton"
+      >
+        Analisis &amp; Hapus Otomatis
+      </button>
+
+      <button
+        type="button"
+        class="unjs-tool__button unjs-tool__button--secondary"
+        id="copyButton"
+      >
+        Copy HTML Lengkap
+      </button>
+
+      <button
+        type="button"
+        class="unjs-tool__button unjs-tool__button--secondary"
+        id="downloadButton"
+      >
+        Download HTML
+      </button>
+
+      <button
+        type="button"
+        class="unjs-tool__button unjs-tool__button--danger"
+        id="resetButton"
+      >
+        Reset
+      </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         STATUS
+    ====================================================== -->
+
+    <div
+      class="unjs-tool__status"
+      id="status"
+      aria-live="polite"
+    >
+      Siap digunakan.
+    </div>
+
+
+    <!-- =====================================================
+         EDITOR GRID
+    ====================================================== -->
+
+    <section class="unjs-tool__grid">
+
+      <!-- INPUT -->
+
+      <div class="unjs-tool__panel">
+
+        <div class="unjs-tool__panel-head">
+
+          <h2>
+            HTML / JavaScript Asli
+          </h2>
+
+          <span
+            class="unjs-tool__counter"
+            id="inputCount"
+          >
+            0 karakter
+          </span>
+
+        </div>
+
+        <textarea
+          id="inputCode"
+          class="unjs-tool__textarea"
+          spellcheck="false"
+          placeholder="Paste HTML lengkap di sini..."
+        ></textarea>
+
+      </div>
+
+
+      <!-- OUTPUT -->
+
+      <div class="unjs-tool__panel">
+
+        <div class="unjs-tool__panel-head">
+
+          <h2>
+            Hasil HTML Bersih
+          </h2>
+
+          <span
+            class="unjs-tool__counter"
+            id="outputCount"
+          >
+            0 karakter
+          </span>
+
+        </div>
+
+        <textarea
+          id="outputCode"
+          class="unjs-tool__textarea"
+          spellcheck="false"
+          placeholder="Hasil HTML lengkap muncul di sini..."
+        ></textarea>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         RESULT
+    ====================================================== -->
+
+    <section
+      class="unjs-tool__result"
+      id="candidateBox"
+    >
+
+      <h2>
+        Fungsi Otomatis Dihapus
+      </h2>
+
+      <p>
+        Belum ada proses.
+      </p>
+
+    </section>
+
+
+    <!-- =====================================================
+         REPORT
+    ====================================================== -->
+
+    <section
+      class="unjs-tool__report"
+      id="report"
+    >
+
+      <strong>
+        Laporan:
+      </strong>
+
+      Belum ada analisis.
+
+    </section>
+
+
+  </div>
+
+
+  <!-- =======================================================
+       JAVASCRIPT
+  ======================================================== -->
+
+  <script>
+
+    const root =
+      document.querySelector(".unjs-tool");
+
+    if (root) {
+
+      const inputCode =
+        root.querySelector("#inputCode");
+
+      const outputCode =
+        root.querySelector("#outputCode");
+
+      const statusBox =
+        root.querySelector("#status");
+
+      const candidateBox =
+        root.querySelector("#candidateBox");
+
+      const reportBox =
+        root.querySelector("#report");
+
+      const inputCount =
+        root.querySelector("#inputCount");
+
+      const outputCount =
+        root.querySelector("#outputCount");
+
+      const analyzeButton =
+        root.querySelector("#analyzeButton");
+
+      const copyButton =
+        root.querySelector("#copyButton");
+
+      const downloadButton =
+        root.querySelector("#downloadButton");
+
+      const resetButton =
+        root.querySelector("#resetButton");
+
+
+      /* =====================================================
+         COUNT
+      ====================================================== */
+
+      function updateCount() {
+
+        if (inputCount) {
+
+          inputCount.textContent =
+            inputCode.value.length.toLocaleString("id-ID") +
+            " karakter";
+
+        }
+
+        if (outputCount) {
+
+          outputCount.textContent =
+            outputCode.value.length.toLocaleString("id-ID") +
+            " karakter";
+
+        }
+
+      }
+
+
+      /* =====================================================
+         FIND FUNCTIONS
+      ====================================================== */
+
+      function getFunctionNames(js) {
+
+        const names = new Set();
+
+        let match;
+
+
+        const reg1 =
+          /function\s+([A-Za-z_$][\w$]*)\s*\(/g;
+
+        while ((match = reg1.exec(js))) {
+
+          names.add(match[1]);
+
+        }
+
+
+        const reg2 =
+          /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>/g;
+
+        while ((match = reg2.exec(js))) {
+
+          names.add(match[1]);
+
+        }
+
+
+        const reg3 =
+          /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?function\s*\(/g;
+
+        while ((match = reg3.exec(js))) {
+
+          names.add(match[1]);
+
+        }
+
+
+        return [...names];
+
+      }
+
+
+      /* =====================================================
+         COUNT USAGE
+      ====================================================== */
+
+      function countUsage(name, source) {
+
+        const regex =
+          new RegExp(
+            "\\b" + name + "\\b",
+            "g"
+          );
+
+        const result =
+          source.match(regex);
+
+        return result
+          ? result.length
+          : 0;
+
+      }
+
+
+      /* =====================================================
+         CHECK EVENT
+      ====================================================== */
+
+      function checkEvent(name, html) {
+
+        return new RegExp(
+          "on[a-z]+\\s*=\\s*[\"'][^\"']*" +
+          name +
+          "\\s*\\(",
+          "i"
+        ).test(html);
+
+      }
+
+
+      /* =====================================================
+         FIND FUNCTION END
+      ====================================================== */
+
+      function findEnd(code, start) {
+
+        let depth = 0;
+        let quote = null;
+        let escape = false;
+
+
+        for (
+          let i = start;
+          i < code.length;
+          i++
+        ) {
+
+          const char = code[i];
+
+
+          if (quote) {
+
+            if (escape) {
+
+              escape = false;
+
+            } else if (char === "\\") {
+
+              escape = true;
+
+            } else if (char === quote) {
+
+              quote = null;
+
+            }
+
+            continue;
+
+          }
+
+
+          if (
+            char === "'" ||
+            char === '"' ||
+            char === "`"
+          ) {
+
+            quote = char;
+            continue;
+
+          }
+
+
+          if (char === "{") {
+
+            depth++;
+
+          }
+
+
+          if (char === "}") {
+
+            depth--;
+
+            if (depth === 0) {
+
+              return i;
+
+            }
+
+          }
+
+        }
+
+
+        return -1;
+
+      }
+
+
+      /* =====================================================
+         REMOVE FUNCTION
+      ====================================================== */
+
+      function removeFunction(js, name) {
+
+        const patterns = [
+
+          new RegExp(
+            "function\\s+" +
+            name +
+            "\\s*\\([^)]*\\)\\s*\\{",
+            "g"
+          ),
+
+          new RegExp(
+            "(?:const|let|var)\\s+" +
+            name +
+            "\\s*=\\s*" +
+            "(?:async\\s*)?" +
+            "(?:\\([^)]*\\)|[A-Za-z_$][\\w$]*)" +
+            "\\s*=>\\s*\\{",
+            "g"
+          ),
+
+          new RegExp(
+            "(?:const|let|var)\\s+" +
+            name +
+            "\\s*=\\s*" +
+            "(?:async\\s*)?" +
+            "function\\s*\\([^)]*\\)\\s*\\{",
+            "g"
+          )
+
+        ];
+
+
+        patterns.forEach((regex) => {
+
+          let match;
+
+
+          while ((match = regex.exec(js))) {
+
+            const start =
+              match.index;
+
+            const open =
+              js.indexOf("{", start);
+
+            const close =
+              findEnd(js, open);
+
+
+            if (close !== -1) {
+
+              js =
+                js.substring(0, start) +
+                js.substring(close + 1);
+
+            }
+
+          }
+
+        });
+
+
+        return js;
+
+      }
+
+
+      /* =====================================================
+         ANALYZE
+      ====================================================== */
+
+      function analyzeAndRemove() {
+
+        let html =
+          inputCode.value;
+
+
+        if (!html.trim()) {
+
+          statusBox.textContent =
+            "Masukkan HTML terlebih dahulu.";
+
+          return;
+
+        }
+
+
+        const removed = [];
+
+        let total = 0;
+
+
+        html =
+          html.replace(
+            /(<script\b[^>]*>)([\s\S]*?)(<\/script>)/gi,
+            function (
+              full,
+              start,
+              js,
+              end
+            ) {
+
+
+              /*
+               * Jangan sentuh external script
+               */
+
+              if (
+                /\bsrc\s*=/i.test(start)
+              ) {
+
+                return full;
+
+              }
+
+
+              /*
+               * Jangan sentuh JSON-LD
+               */
+
+              if (
+                /type\s*=\s*["']application\/ld\+json["']/i.test(start)
+              ) {
+
+                return full;
+
+              }
+
+
+              const names =
+                getFunctionNames(js);
+
+
+              total +=
+                names.length;
+
+
+              names.forEach((name) => {
+
+                const usage =
+                  countUsage(
+                    name,
+                    html
+                  );
+
+
+                const event =
+                  checkEvent(
+                    name,
+                    html
+                  );
+
+
+                if (
+                  usage <= 1 &&
+                  !event
+                ) {
+
+                  removed.push(name);
+
+                  js =
+                    removeFunction(
+                      js,
+                      name
+                    );
+
+                }
+
+              });
+
+
+              return (
+                start +
+                js +
+                end
+              );
+
+            }
+          );
+
+
+        outputCode.value =
+          html;
+
+
+        updateCount();
+
+
+        candidateBox.innerHTML = `
+
+          <h2>
+            Fungsi Otomatis Dihapus
+          </h2>
+
+          <p>
+            ${
+              removed.length
+                ? removed
+                    .map(
+                      (name) =>
+                        "<code>" +
+                        name +
+                        "()</code>"
+                    )
+                    .join(", ")
+                : "Tidak ada fungsi yang dihapus."
+            }
+          </p>
+
+        `;
+
+
+        reportBox.innerHTML = `
+
+          <strong>
+            Laporan:
+          </strong>
+
+          <br>
+
+          Total fungsi ditemukan:
+          ${total}
+
+          <br>
+
+          Fungsi dihapus:
+          ${removed.length}
+
+        `;
+
+
+        statusBox.textContent =
+          "Hasil HTML berhasil dibuat.";
+
+      }
+
+
+      /* =====================================================
+         COPY
+      ====================================================== */
+
+      async function copyResult() {
+
+        if (!outputCode.value) {
+
+          statusBox.textContent =
+            "Belum ada hasil.";
+
+          return;
+
+        }
+
+
+        try {
+
+          await navigator.clipboard.writeText(
+            outputCode.value
+          );
+
+        } catch (error) {
+
+          outputCode.select();
+
+          document.execCommand("copy");
+
+        }
+
+
+        statusBox.textContent =
+          "HTML berhasil dicopy.";
+
+      }
+
+
+      /* =====================================================
+         DOWNLOAD
+      ====================================================== */
+
+      function downloadHTML() {
+
+        if (!outputCode.value) {
+
+          statusBox.textContent =
+            "Belum ada hasil.";
+
+          return;
+
+        }
+
+
+        const blob =
+          new Blob(
+            [outputCode.value],
+            {
+              type:
+                "text/html;charset=utf-8"
+            }
+          );
+
+
+        const url =
+          URL.createObjectURL(blob);
+
+
+        const link =
+          document.createElement("a");
+
+
+        link.href = url;
+
+        link.download =
+          "unjs-clean.html";
+
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+
+        URL.revokeObjectURL(url);
+
+
+        statusBox.textContent =
+          "Download selesai.";
+
+      }
+
+
+      /* =====================================================
+         RESET
+      ====================================================== */
+
+      function resetAll() {
+
+        inputCode.value = "";
+
+        outputCode.value = "";
+
+
+        candidateBox.innerHTML = `
+
+          <h2>
+            Fungsi Otomatis Dihapus
+          </h2>
+
+          <p>
+            Belum ada proses.
+          </p>
+
+        `;
+
+
+        reportBox.innerHTML = `
+
+          <strong>
+            Laporan:
+          </strong>
+
+          Belum ada analisis.
+
+        `;
+
+
+        statusBox.textContent =
+          "Reset selesai.";
+
+
+        updateCount();
+
+      }
+
+
+      /* =====================================================
+         EVENTS
+      ====================================================== */
+
+      inputCode?.addEventListener(
+        "input",
+        updateCount
+      );
+
+
+      outputCode?.addEventListener(
+        "input",
+        updateCount
+      );
+
+
+      analyzeButton?.addEventListener(
+        "click",
+        analyzeAndRemove
+      );
+
+
+      copyButton?.addEventListener(
+        "click",
+        copyResult
+      );
+
+
+      downloadButton?.addEventListener(
+        "click",
+        downloadHTML
+      );
+
+
+      resetButton?.addEventListener(
+        "click",
+        resetAll
+      );
+
+
+      updateCount();
+
+    }
+
+  </script>
+
+
+  <!-- =======================================================
+       SCOPED CSS
+       Tidak menggunakan :global
+       Tidak menyentuh header MainLayout
+  ======================================================== -->
+
+  <style>
+
+    /* =====================================================
+       ROOT TOOL
+    ====================================================== */
+
+    .unjs-tool {
+
+      width: min(1450px, calc(100% - 32px));
+
+      margin: 0 auto;
+
+      padding: 50px 0 70px;
+
+      color: var(--text);
+
+      font-family: var(--font-family);
+
+    }
+
+
+    /* =====================================================
+       HERO
+    ====================================================== */
+
+    .unjs-tool__hero {
+
+      margin-bottom: 28px;
+
+      padding: 28px;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius:
+        var(--radius-lg);
+
+      background:
+        var(--surface);
+
+      box-shadow:
+        var(--shadow);
+
+    }
+
+
+    .unjs-tool__label {
+
+      display: inline-block;
+
+      margin-bottom: 10px;
+
+      color:
+        var(--primary);
+
+      font-size: 12px;
+
+      font-weight: 700;
+
+      letter-spacing: .08em;
+
+    }
+
+
+    .unjs-tool__title {
+
+      margin: 0 0 12px;
+
+      color:
+        var(--text);
+
+      font-size:
+        clamp(28px, 5vw, 42px);
+
+      line-height: 1.15;
+
+    }
+
+
+    .unjs-tool__description {
+
+      max-width: 850px;
+
+      margin: 0;
+
+      color:
+        var(--text-soft);
+
+      font-size: 15px;
+
+      line-height: 1.7;
+
+    }
+
+
+    /* =====================================================
+       WARNING
+    ====================================================== */
+
+    .unjs-tool__warning {
+
+      margin-bottom: 18px;
+
+      padding: 15px 17px;
+
+      color:
+        var(--accent);
+
+      background:
+        color-mix(
+          in srgb,
+          var(--accent) 8%,
+          transparent
+        );
+
+      border-left:
+        4px solid
+        var(--accent);
+
+      border-radius:
+        var(--radius);
+
+      font-size: 14px;
+
+      line-height: 1.7;
+
+    }
+
+
+    .unjs-tool__warning strong {
+
+      color:
+        var(--accent);
+
+    }
+
+
+    /* =====================================================
+       TOOLBAR
+    ====================================================== */
+
+    .unjs-tool__toolbar {
+
+      display: flex;
+
+      flex-wrap: wrap;
+
+      gap: 10px;
+
+      margin-bottom: 12px;
+
+    }
+
+
+    .unjs-tool__button {
+
+      appearance: none;
+
+      border: 1px solid transparent;
+
+      border-radius:
+        var(--radius);
+
+      padding: 11px 16px;
+
+      color:
+        var(--text);
+
+      background:
+        var(--surface);
+
+      font: inherit;
+
+      font-size: 14px;
+
+      font-weight: 700;
+
+      line-height: 1.2;
+
+      cursor: pointer;
+
+      transition:
+        transform .2s ease,
+        filter .2s ease,
+        border-color .2s ease;
+
+    }
+
+
+    .unjs-tool__button:hover {
+
+      transform:
+        translateY(-2px);
+
+      filter:
+        brightness(1.06);
+
+    }
+
+
+    .unjs-tool__button--primary {
+
+      color:
+        var(--bg);
+
+      background:
+        var(--primary);
+
+    }
+
+
+    .unjs-tool__button--secondary {
+
+      color:
+        var(--text);
+
+      background:
+        var(--surface);
+
+      border-color:
+        var(--border);
+
+    }
+
+
+    .unjs-tool__button--danger {
+
+      color:
+        #fff;
+
+      background:
+        var(--danger);
+
+    }
+
+
+    /* =====================================================
+       STATUS
+    ====================================================== */
+
+    .unjs-tool__status {
+
+      min-height: 24px;
+
+      margin: 10px 0 16px;
+
+      color:
+        var(--primary);
+
+      font-size: 14px;
+
+      font-weight: 700;
+
+    }
+
+
+    /* =====================================================
+       GRID
+    ====================================================== */
+
+    .unjs-tool__grid {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 18px;
+
+    }
+
+
+    /* =====================================================
+       PANEL
+    ====================================================== */
+
+    .unjs-tool__panel {
+
+      min-width: 0;
+
+      overflow: hidden;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius:
+        var(--radius-lg);
+
+      background:
+        var(--surface);
+
+      box-shadow:
+        var(--shadow);
+
+    }
+
+
+    .unjs-tool__panel-head {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 12px;
+
+      padding: 14px 16px;
+
+      border-bottom:
+        1px solid
+        var(--border);
+
+    }
+
+
+    .unjs-tool__panel-head h2 {
+
+      margin: 0;
+
+      color:
+        var(--primary);
+
+      font-size: 16px;
+
+      line-height: 1.3;
+
+    }
+
+
+    .unjs-tool__counter {
+
+      flex-shrink: 0;
+
+      color:
+        var(--text-soft);
+
+      font-size: 12px;
+
+    }
+
+
+    /* =====================================================
+       TEXTAREA
+    ====================================================== */
+
+    .unjs-tool__textarea {
+
+      display: block;
+
+      width: 100%;
+
+      min-height: 560px;
+
+      padding: 16px;
+
+      resize: vertical;
+
+      border: 0;
+
+      outline: none;
+
+      background:
+        var(--surface-alt);
+
+      color:
+        var(--text);
+
+      font:
+        13px/1.6
+        Consolas,
+        "Courier New",
+        monospace;
+
+    }
+
+
+    .unjs-tool__textarea:focus {
+
+      box-shadow:
+        inset 0 0 0 1px
+        var(--primary);
+
+    }
+
+
+    .unjs-tool__textarea::placeholder {
+
+      color:
+        var(--text-soft);
+
+    }
+
+
+    .unjs-tool__textarea::-webkit-scrollbar {
+
+      width: 8px;
+
+    }
+
+
+    .unjs-tool__textarea::-webkit-scrollbar-track {
+
+      background:
+        var(--surface-alt);
+
+    }
+
+
+    .unjs-tool__textarea::-webkit-scrollbar-thumb {
+
+      background:
+        var(--border);
+
+      border-radius: 20px;
+
+    }
+
+
+    /* =====================================================
+       RESULT / REPORT
+    ====================================================== */
+
+    .unjs-tool__result,
+    .unjs-tool__report {
+
+      margin-top: 18px;
+
+      padding: 18px;
+
+      border:
+        1px solid
+        var(--border);
+
+      border-radius:
+        var(--radius);
+
+      background:
+        var(--surface);
+
+    }
+
+
+    .unjs-tool__result h2 {
+
+      margin:
+        0 0 10px;
+
+      color:
+        var(--primary);
+
+      font-size: 18px;
+
+    }
+
+
+    .unjs-tool__result p {
+
+      margin: 0;
+
+      color:
+        var(--text-soft);
+
+      line-height: 1.7;
+
+    }
+
+
+    .unjs-tool__report {
+
+      color:
+        var(--text-soft);
+
+      line-height: 1.7;
+
+    }
+
+
+    .unjs-tool__report strong {
+
+      color:
+        var(--primary);
+
+    }
+
+
+    .unjs-tool__result code {
+
+      display: inline-block;
+
+      margin: 2px;
+
+      padding: 3px 6px;
+
+      border-radius: 5px;
+
+      color:
+        var(--accent);
+
+      background:
+        color-mix(
+          in srgb,
+          var(--accent) 8%,
+          transparent
+        );
+
+      font-family:
+        Consolas,
+        "Courier New",
+        monospace;
+
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+    ====================================================== */
+
+    @media (max-width: 900px) {
+
+      .unjs-tool__grid {
+
+        grid-template-columns: 1fr;
+
+      }
+
+      .unjs-tool__textarea {
+
+        min-height: 420px;
+
+      }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+      .unjs-tool {
+
+        width:
+          min(
+            100%,
+            calc(100% - 24px)
+          );
+
+        padding:
+          35px 0 45px;
+
+      }
+
+
+      .unjs-tool__hero {
+
+        padding: 20px;
+
+      }
+
+
+      .unjs-tool__title {
+
+        font-size: 28px;
+
+      }
+
+
+      .unjs-tool__toolbar {
+
+        display: grid;
+
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+
+      }
+
+
+      .unjs-tool__button {
+
+        width: 100%;
+
+      }
+
+
+      .unjs-tool__textarea {
+
+        min-height: 350px;
+
+      }
+
+    }
+
+  </style>
+
+</MainLayout>

@@ -1,0 +1,32 @@
+---
+const { headings = [] } = Astro.props;
+
+const items = headings.filter(
+  (heading) => heading.depth === 2 || heading.depth === 3
+);
+---
+
+{items.length > 0 && (
+  <details class="toc" open>
+    <summary class="toc-title">
+      <span>📑 Daftar Isi</span>
+
+      <span
+        class="toc-toggle"
+        aria-hidden="true"
+      ></span>
+    </summary>
+
+    <nav aria-label="Daftar Isi">
+      <ul>
+        {items.map((heading) => (
+          <li class={`toc-level-${heading.depth}`}>
+            <a href={`#${heading.slug}`}>
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </details>
+)}

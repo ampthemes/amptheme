@@ -1,0 +1,473 @@
+---
+// src/pages/product/search/[query].astro
+
+import MainLayout
+from '../../../layouts/MainLayout.astro';
+
+import {
+  getCollection
+} from 'astro:content';
+
+/* =========================
+   NORMALIZE
+========================= */
+
+const normalize = str =>
+
+  str
+    ?.toString()
+    .toLowerCase()
+    .replace(/-/g,' ')
+    .replace(/[^a-z0-9\s]/g,'')
+    .trim() || '';
+
+/* =========================
+   STATIC SEARCH PATHS
+========================= */
+
+export async function getStaticPaths(){
+
+  const products =
+    await getCollection('product');
+
+  const keywords = new Set();
+
+  products.forEach(product=>{
+
+    /* =========================
+       CATEGORY
+    ========================= */
+
+    if(product.data.category){
+
+      keywords.add(
+        product.data.category
+          .replace(/\s+/g,'-')
+      );
+
+      keywords.add(
+        product.data.category
+      );
+
+    }
+
+    /* =========================
+       FULL TITLE
+    ========================= */
+
+    if(product.data.title){
+
+      keywords.add(
+        product.data.title
+      );
+
+      keywords.add(
+        product.data.title
+          .replace(/\s+/g,'-')
+      );
+
+      /* SINGLE WORDS */
+
+      product.data.title
+        .split(/\s+/)
+        .forEach(word=>{
+
+          if(word.length > 2){
+
+            keywords.add(word);
+
+          }
+
+        });
+
+    }
+
+    /* =========================
+       DESCRIPTION
+    ========================= */
+
+    if(product.data.description){
+
+      product.data.description
+        .split(/\s+/)
+        .forEach(word=>{
+
+          if(word.length > 3){
+
+            keywords.add(word);
+
+          }
+
+        });
+
+    }
+
+  });
+
+  return [...keywords]
+    .filter(Boolean)
+    .map(query=>({
+
+      params:{ query }
+
+    }));
+
+}
+
+/* =========================
+   PAGE DATA
+========================= */
+
+const { query } =
+  Astro.params;
+
+const products =
+  await getCollection('product');
+
+const search =
+  normalize(query);
+
+const filtered =
+  products.filter(product=>{
+
+    const title =
+      normalize(
+        product.data.title
+      );
+
+    const category =
+      normalize(
+        product.data.category
+      );
+
+    const desc =
+      normalize(
+        product.data.description
+      );
+
+    return (
+
+      title.includes(search) ||
+
+      category.includes(search) ||
+
+      desc.includes(search)
+
+    );
+
+  });
+
+---
+
+<MainLayout
+  title={`Search: ${query}`}
+  description={`Search results for ${query}`}
+>
+
+  <Fragment slot="head">
+    <meta
+      name="robots"
+      content="noindex,follow"
+    />
+  </Fragment>
+
+<section class="search-page">
+
+  <div class="search-head">
+
+    <h1>
+
+      Search:
+      <span>{query}</span>
+
+    </h1>
+
+    <p>
+
+      {filtered.length}
+      products found
+
+    </p>
+
+  </div>
+
+  {
+    filtered.length > 0 ? (
+
+      <div class="products-grid">
+
+        {
+          filtered.map(product => (
+
+            <a
+              href={`/product/${product.slug}`}
+              class="card"
+            >
+
+              <div class="card-image">
+
+                <img
+                  src={product.data.image}
+                  alt={product.data.title}
+                  loading="lazy"
+                />
+
+              </div>
+
+              <div class="card-body">
+
+                <span class="category">
+                  {product.data.category}
+                </span>
+
+                <h2>
+                  {product.data.title}
+                </h2>
+
+                <p>
+                  {product.data.description}
+                </p>
+
+                <div class="price-wrap">
+
+                  <span class="price">
+                    {product.data.price}
+                  </span>
+
+                  {
+                    product.data.oldPrice && (
+
+                      <span class="old-price">
+                        {product.data.oldPrice}
+                      </span>
+
+                    )
+                  }
+
+                </div>
+
+              </div>
+
+            </a>
+
+          ))
+        }
+
+      </div>
+
+    ) : (
+
+      <div class="empty-state">
+
+        <h2>
+          No products found
+        </h2>
+
+        <p>
+          Try another keyword or category.
+        </p>
+
+      </div>
+
+    )
+  }
+
+</section>
+
+<style>
+
+/* =========================
+   PAGE
+========================= */
+
+.search-page{
+padding:10px 0 40px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.search-head{
+margin-bottom:40px;
+}
+
+.search-head h1{
+font-size:52px;
+line-height:1.1;
+margin-bottom:12px;
+}
+
+.search-head span{
+color:var(--primary);
+}
+
+.search-head p{
+color:var(--muted);
+font-size:18px;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.products-grid{
+display:grid;
+grid-template-columns:
+repeat(4,1fr);
+
+gap:24px;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.card{
+background:#fff;
+
+border-radius:30px;
+
+overflow:hidden;
+
+box-shadow:var(--shadow);
+
+transition:.25s;
+}
+
+.card:hover{
+transform:translateY(-6px);
+}
+
+.card-image{
+overflow:hidden;
+}
+
+.card-image img{
+width:100%;
+
+height:360px;
+
+object-fit:cover;
+
+transition:.35s;
+}
+
+.card:hover img{
+transform:scale(1.05);
+}
+
+.card-body{
+padding:22px;
+}
+
+.category{
+display:inline-flex;
+
+margin-bottom:12px;
+
+font-size:13px;
+
+font-weight:700;
+
+color:var(--primary);
+}
+
+.card h2{
+font-size:24px;
+
+line-height:1.3;
+
+margin-bottom:12px;
+}
+
+.card p{
+color:#666;
+
+line-height:1.7;
+
+margin-bottom:18px;
+}
+
+.price-wrap{
+display:flex;
+
+align-items:center;
+
+gap:12px;
+}
+
+.price{
+font-size:30px;
+
+font-weight:900;
+}
+
+.old-price{
+color:#9ca3af;
+
+text-decoration:line-through;
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty-state{
+background:#fff;
+
+padding:60px 30px;
+
+border-radius:32px;
+
+text-align:center;
+
+box-shadow:var(--shadow);
+}
+
+.empty-state h2{
+font-size:34px;
+
+margin-bottom:12px;
+}
+
+.empty-state p{
+color:var(--muted);
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media(max-width:1200px){
+
+.products-grid{
+grid-template-columns:
+repeat(2,1fr);
+}
+
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:768px){
+
+.search-head h1{
+font-size:36px;
+}
+
+.products-grid{
+grid-template-columns:1fr;
+}
+
+.card-image img{
+height:300px;
+}
+
+}
+
+</style>
+
+</MainLayout>

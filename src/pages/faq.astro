@@ -1,0 +1,195 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import { SITE } from "../lib/site";
+import "../styles/pages.css";
+
+const pageTitle = `FAQ - ${SITE.name || "Ai Mr Ferdy"}`;
+
+const pageDescription =
+  "Pertanyaan yang sering ditanyakan tentang Ai Mr Ferdy, AI, SEO, tools online, teknologi, dan layanan digital.";
+
+const faqs = [
+  {
+    question: "Apa itu Ai Mr Ferdy?",
+    answer:
+      "Ai Mr Ferdy adalah platform digital yang membahas dan mengembangkan berbagai hal terkait AI, teknologi, SEO, website, automation, dan tools online."
+  },
+  {
+    question: "Apa saja yang tersedia di Ai Mr Ferdy?",
+    answer:
+      "Ai Mr Ferdy menyediakan artikel, panduan, tools online, informasi teknologi, serta berbagai resource digital yang dapat digunakan untuk kebutuhan sehari-hari."
+  },
+  {
+    question: "Apakah tools di Ai Mr Ferdy gratis?",
+    answer:
+      "Sebagian besar tools yang tersedia dapat digunakan langsung melalui browser tanpa proses instalasi. Ketentuan penggunaan dapat berbeda pada setiap tool."
+  },
+  {
+    question: "Apakah Ai Mr Ferdy membahas SEO?",
+    answer:
+      "Ya. Pembahasannya mencakup SEO, struktur website, technical SEO, content strategy, performa, dan berbagai topik yang berkaitan dengan pengembangan website."
+  },
+  {
+    question: "Apakah tersedia tutorial AI?",
+    answer:
+      "Ya. Konten AI mencakup berbagai topik seperti penggunaan AI, automation, workflow digital, serta perkembangan teknologi AI."
+  },
+  {
+    question: "Apakah Ai Mr Ferdy menyediakan layanan website?",
+    answer:
+      "Informasi mengenai kebutuhan website, optimasi, dan pengembangan digital dapat didiskusikan melalui halaman Contact."
+  },
+  {
+    question: "Bagaimana cara menghubungi Ai Mr Ferdy?",
+    answer:
+      "Anda dapat mengunjungi halaman Contact untuk menyampaikan pertanyaan, kebutuhan proyek, atau permintaan konsultasi."
+  }
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: faq.answer
+    }
+  }))
+};
+---
+
+<MainLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonical={`${SITE.url()}/faq`}
+>
+
+  <main class="page page-faq">
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="page-hero">
+
+      <div class="page-container">
+
+        <span class="page-label">
+          FAQ
+        </span>
+
+        <h1>
+          Pertanyaan yang Sering Ditanyakan
+        </h1>
+
+        <p>
+          Temukan jawaban mengenai Ai Mr Ferdy,
+          AI, SEO, tools online, website, dan
+          teknologi digital.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         FAQ
+    ====================================================== -->
+
+    <section class="page-section">
+
+      <div class="page-container">
+
+        <div class="page-section-heading">
+
+          <span class="page-label">
+            INFORMATION
+          </span>
+
+          <h2>
+            Frequently Asked Questions
+          </h2>
+
+          <p>
+            Beberapa pertanyaan umum yang dapat membantu
+            memahami platform dan layanan Ai Mr Ferdy.
+          </p>
+
+        </div>
+
+
+        <div class="page-legal">
+
+          {
+            faqs.map((faq) => (
+
+              <article class="page-legal-section">
+
+                <h3>
+                  {faq.question}
+                </h3>
+
+                <p>
+                  {faq.answer}
+                </p>
+
+              </article>
+
+            ))
+          }
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CTA
+    ====================================================== -->
+
+    <section class="page-cta">
+
+      <div class="page-container">
+
+        <span class="page-label">
+          NEED MORE HELP?
+        </span>
+
+        <h2>
+          Masih Punya Pertanyaan?
+        </h2>
+
+        <p>
+          Jika belum menemukan jawaban yang Anda cari,
+          silakan hubungi Ai Mr Ferdy secara langsung.
+        </p>
+
+        <a
+          href="/contact/"
+          class="page-button page-button-primary"
+        >
+          Hubungi Ai Mr Ferdy
+        </a>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       FAQ SCHEMA
+  ====================================================== -->
+
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd)}
+  />
+
+</MainLayout>

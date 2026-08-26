@@ -1,0 +1,138 @@
+---
+import { SITE } from "../lib/site";
+import {
+  organizationSchema,
+  websiteSchema
+} from "../lib/schema";
+
+const {
+  title = SITE.title,
+  description = SITE.description,
+  canonical = new URL(
+    Astro.url.pathname,
+    SITE.baseUrl
+  ).toString(),
+  image = null,
+  slug = "",
+  type = "website",
+  faqSchema = null,
+  articleSchema = null,
+  softwareSchema = null,
+  breadcrumbs = null,
+  amp = null,
+  isHome = false
+} = Astro.props;
+
+// AUTO OG IMAGE
+const imageUrl = slug
+  ? SITE.url(`/api/og/${slug}.svg`)
+  : SITE.imageUrl(SITE.image);
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<title>{title}</title>
+
+<meta name="description" content={description} />
+<meta name="author" content={SITE.author} />
+<meta name="theme-color" content={SITE.themeColor} />
+
+<meta
+  name="robots"
+  content="index,follow,max-image-preview:large"
+/>
+
+<link rel="canonical" href={canonical} />
+<link rel="alternate" hreflang="id-ID" href={canonical} />
+
+<link rel="icon" href="/images/fav.webp" type="image/webp">
+<link rel="apple-touch-icon" href="/images/fav.webp">
+
+
+
+{amp && (
+  <link rel="amphtml" href={amp} />
+)}
+
+<!-- Open Graph -->
+<meta property="og:type" content={type} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:url" content={canonical} />
+<meta property="og:site_name" content={SITE.title} />
+
+<!-- Twitter -->
+<meta
+  name="twitter:card"
+  content="summary_large_image"
+/>
+
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  title={SITE.title}
+  href={SITE.url("/rss.xml")}
+/>
+<!-- preload -->
+<link
+  rel="preload"
+  href={imageUrl}
+  as="image"
+/>
+
+<!-- schema -->
+{!isHome && (
+  <>
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(organizationSchema)}
+    />
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(websiteSchema)}
+    />
+  </>
+)}
+
+{breadcrumbs?.length > 0 && (
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: breadcrumbs.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: item.name,
+        item: new URL(item.url, SITE.baseUrl).toString(),
+      })),
+    })}
+  />
+)}
+
+{articleSchema && (
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(articleSchema)}
+  />
+)}
+
+{softwareSchema && (
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(softwareSchema)}
+  />
+)}
+
+{faqSchema && (
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(faqSchema)}
+  />
+)}

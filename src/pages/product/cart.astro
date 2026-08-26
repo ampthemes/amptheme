@@ -1,0 +1,1676 @@
+---
+import MainLayout from "../../layouts/MainLayout.astro";
+---
+
+<MainLayout
+  title="Shopping Cart | AI Mr Ferdy"
+  description="Lihat dan kelola produk yang telah ditambahkan ke keranjang AI Mr Ferdy."
+  canonical="/product/cart/"
+>
+
+<main class="cart-page">
+
+  <div class="cart-container">
+
+    <!-- =====================================================
+         CART HEADER
+    ====================================================== -->
+
+    <header class="cart-header">
+
+      <div>
+
+        <span class="cart-label">
+          SHOPPING CART
+        </span>
+
+        <h1>
+          Your Cart
+        </h1>
+
+        <p>
+          Review produk Anda sebelum melanjutkan ke checkout.
+        </p>
+
+      </div>
+
+      <a
+        href="/product/"
+        class="continue-shopping"
+      >
+        ← Continue Shopping
+      </a>
+
+    </header>
+
+
+    <!-- =====================================================
+         CART LAYOUT
+    ====================================================== -->
+
+    <div
+      class="cart-layout"
+      id="cartLayout"
+    >
+
+      <!-- ===================================================
+           CART ITEMS
+      ==================================================== -->
+
+      <section class="cart-items">
+
+        <div
+          id="cartItems"
+          aria-live="polite"
+        ></div>
+
+
+        <!-- =================================================
+             EMPTY CART
+        ================================================== -->
+
+        <div
+          class="cart-empty"
+          id="cartEmpty"
+          hidden
+        >
+
+          <div class="empty-icon">
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+
+              <circle
+                cx="9"
+                cy="20"
+                r="1"
+              />
+
+              <circle
+                cx="18"
+                cy="20"
+                r="1"
+              />
+
+              <path
+                d="M3 4h2l2.4 11.5a2 2 0 0 0 2 1.5h7.7a2 2 0 0 0 2-1.5L21 8H6"
+              />
+
+            </svg>
+
+          </div>
+
+
+          <h2>
+            Your cart is empty
+          </h2>
+
+
+          <p>
+            Belum ada produk yang ditambahkan ke keranjang.
+          </p>
+
+
+          <a
+            href="/product/"
+            class="empty-button"
+          >
+            Browse Products
+          </a>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================
+           ORDER SUMMARY
+      ==================================================== -->
+
+      <aside
+        class="cart-summary"
+        id="cartSummary"
+        hidden
+      >
+
+        <h2>
+          Order Summary
+        </h2>
+
+
+        <div class="summary-row">
+
+          <span>
+            Items
+          </span>
+
+          <strong id="summaryItems">
+            0
+          </strong>
+
+        </div>
+
+
+        <div class="summary-row">
+
+          <span>
+            Subtotal
+          </span>
+
+          <strong id="subtotal">
+            Rp 0
+          </strong>
+
+        </div>
+
+
+        <div class="summary-row">
+
+          <span>
+            Shipping
+          </span>
+
+          <span class="free">
+            FREE
+          </span>
+
+        </div>
+
+
+        <div class="summary-divider"></div>
+
+
+        <div class="summary-total">
+
+          <span>
+            Total
+          </span>
+
+          <strong id="total">
+            Rp 0
+          </strong>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="checkout-button"
+          id="checkoutButton"
+        >
+          Proceed to Checkout
+        </button>
+
+
+        <div class="secure-checkout">
+
+          <span>✓</span>
+
+          Secure checkout
+
+        </div>
+
+      </aside>
+
+    </div>
+
+  </div>
+
+</main>
+
+
+<script is:inline>
+
+(() => {
+
+  /*
+   * =====================================================
+   * CART CONFIGURATION
+   * =====================================================
+   *
+   * Gunakan SATU storage utama:
+   *
+   * localStorage["cart"]
+   *
+   */
+
+  const CART_KEY = "cart";
+
+
+  /*
+   * =====================================================
+   * ELEMENTS
+   * =====================================================
+   */
+
+  const cartItems =
+    document.getElementById("cartItems");
+
+  const cartEmpty =
+    document.getElementById("cartEmpty");
+
+  const cartSummary =
+    document.getElementById("cartSummary");
+
+  const summaryItems =
+    document.getElementById("summaryItems");
+
+  const subtotalElement =
+    document.getElementById("subtotal");
+
+  const totalElement =
+    document.getElementById("total");
+
+  const checkoutButton =
+    document.getElementById("checkoutButton");
+
+
+  /*
+   * =====================================================
+   * PARSE CART
+   * =====================================================
+   */
+
+  function parseCart(value) {
+
+    try {
+
+      const parsed =
+        JSON.parse(value || "[]");
+
+      return Array.isArray(parsed)
+        ? parsed
+        : [];
+
+    } catch {
+
+      return [];
+
+    }
+
+  }
+
+
+  /*
+   * =====================================================
+   * GET CART
+   * =====================================================
+   */
+
+  function getCart() {
+
+    return parseCart(
+      localStorage.getItem(CART_KEY)
+    );
+
+  }
+
+
+  /*
+   * =====================================================
+   * SAVE CART
+   * =====================================================
+   */
+
+  function saveCart(cart) {
+
+    localStorage.setItem(
+      CART_KEY,
+      JSON.stringify(cart)
+    );
+
+
+    /*
+     * Beritahu Header bahwa cart berubah.
+     */
+
+    window.dispatchEvent(
+      new Event("cartUpdated")
+    );
+
+  }
+
+
+  /*
+   * =====================================================
+   * CLEAR CART
+   * =====================================================
+   */
+
+  function clearCart() {
+
+    localStorage.removeItem(
+      CART_KEY
+    );
+
+
+    /*
+     * Update Header secara langsung
+     * pada tab yang sama.
+     */
+
+    window.dispatchEvent(
+      new Event("cartUpdated")
+    );
+
+  }
+
+
+  /*
+   * =====================================================
+   * PRICE TO NUMBER
+   * =====================================================
+   */
+
+  function getPrice(value) {
+
+    if (
+      typeof value === "number" &&
+      Number.isFinite(value)
+    ) {
+
+      return value;
+
+    }
+
+
+    if (
+      typeof value === "string"
+    ) {
+
+      const cleaned =
+        value.replace(
+          /[^\d]/g,
+          ""
+        );
+
+      return Number(cleaned) || 0;
+
+    }
+
+
+    return 0;
+
+  }
+
+
+  /*
+   * =====================================================
+   * FORMAT PRICE
+   * =====================================================
+   */
+
+  function formatPrice(value) {
+
+    return new Intl.NumberFormat(
+      "id-ID",
+      {
+        style: "currency",
+        currency: "IDR",
+        maximumFractionDigits: 0
+      }
+    ).format(
+      getPrice(value)
+    );
+
+  }
+
+
+  /*
+   * =====================================================
+   * ESCAPE HTML
+   * =====================================================
+   */
+
+  function escapeHtml(value) {
+
+    return String(
+      value ?? ""
+    )
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+      .replace(
+        /</g,
+        "&lt;"
+      )
+      .replace(
+        />/g,
+        "&gt;"
+      )
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+      .replace(
+        /'/g,
+        "&#039;"
+      );
+
+  }
+
+
+  /*
+   * =====================================================
+   * NORMALIZE CART
+   * =====================================================
+   */
+
+  function normalizeCart(cart) {
+
+    return cart
+      .map(item => {
+
+        const quantity =
+          Math.max(
+            1,
+            Number(
+              item.quantity || 1
+            )
+          );
+
+
+        return {
+
+          id:
+            item.id ||
+            item.slug ||
+            item.title ||
+            "",
+
+          slug:
+            item.slug ||
+            "",
+
+          title:
+            item.title ||
+            "Product",
+
+          category:
+            item.category ||
+            "Product",
+
+          price:
+            getPrice(
+              item.price
+            ),
+
+          quantity,
+
+          image:
+            item.image ||
+            item.img ||
+            "/api/og/default.svg"
+
+        };
+
+      })
+      .filter(
+        item => item.id
+      );
+
+  }
+
+
+  /*
+   * =====================================================
+   * RENDER CART
+   * =====================================================
+   */
+
+  function renderCart() {
+
+    if (!cartItems) {
+      return;
+    }
+
+
+    const cart =
+      normalizeCart(
+        getCart()
+      );
+
+
+    /*
+     * Simpan hasil normalisasi
+     * jika format cart berubah.
+     */
+
+    if (
+      JSON.stringify(cart) !==
+      JSON.stringify(getCart())
+    ) {
+
+      localStorage.setItem(
+        CART_KEY,
+        JSON.stringify(cart)
+      );
+
+    }
+
+
+    cartItems.innerHTML = "";
+
+
+    /*
+     * ===================================================
+     * EMPTY CART
+     * ===================================================
+     */
+
+    if (!cart.length) {
+
+      cartEmpty.hidden = false;
+
+      cartSummary.hidden = true;
+
+
+      summaryItems.textContent =
+        "0";
+
+      subtotalElement.textContent =
+        "Rp 0";
+
+      totalElement.textContent =
+        "Rp 0";
+
+
+      return;
+
+    }
+
+
+    /*
+     * ===================================================
+     * CART AVAILABLE
+     * ===================================================
+     */
+
+    cartEmpty.hidden = true;
+
+    cartSummary.hidden = false;
+
+
+    let totalQuantity = 0;
+
+    let subtotal = 0;
+
+
+    /*
+     * ===================================================
+     * RENDER ITEMS
+     * ===================================================
+     */
+
+    cart.forEach(
+      (item, index) => {
+
+        const quantity =
+          Math.max(
+            1,
+            Number(
+              item.quantity || 1
+            )
+          );
+
+
+        const price =
+          getPrice(
+            item.price
+          );
+
+
+        const itemTotal =
+          price * quantity;
+
+
+        totalQuantity +=
+          quantity;
+
+
+        subtotal +=
+          itemTotal;
+
+
+        const article =
+          document.createElement(
+            "article"
+          );
+
+
+        article.className =
+          "cart-item";
+
+
+        article.innerHTML = `
+
+          <div class="cart-product-image">
+
+            <img
+              src="${escapeHtml(item.image)}"
+              alt="${escapeHtml(item.title)}"
+              loading="lazy"
+            >
+
+          </div>
+
+
+          <div class="cart-product-info">
+
+            <div class="cart-product-category">
+
+              ${escapeHtml(item.category)}
+
+            </div>
+
+
+            <h2>
+
+              <a
+                href="/product/${encodeURIComponent(item.slug)}/"
+              >
+
+                ${escapeHtml(item.title)}
+
+              </a>
+
+            </h2>
+
+
+            <div class="cart-product-price">
+
+              ${formatPrice(item.price)}
+
+            </div>
+
+
+            <div class="cart-item-bottom">
+
+              <div class="cart-quantity">
+
+                <button
+                  type="button"
+                  class="quantity-minus"
+                  data-index="${index}"
+                  aria-label="Decrease quantity"
+                >
+                  −
+                </button>
+
+
+                <span>
+                  ${quantity}
+                </span>
+
+
+                <button
+                  type="button"
+                  class="quantity-plus"
+                  data-index="${index}"
+                  aria-label="Increase quantity"
+                >
+                  +
+                </button>
+
+              </div>
+
+
+              <button
+                type="button"
+                class="remove-item"
+                data-index="${index}"
+              >
+                Remove
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div class="cart-item-total">
+
+            ${formatPrice(itemTotal)}
+
+          </div>
+
+        `;
+
+
+        cartItems.appendChild(
+          article
+        );
+
+      }
+    );
+
+
+    /*
+     * ===================================================
+     * SUMMARY
+     * ===================================================
+     */
+
+    summaryItems.textContent =
+      String(totalQuantity);
+
+
+    subtotalElement.textContent =
+      formatPrice(subtotal);
+
+
+    totalElement.textContent =
+      formatPrice(subtotal);
+
+  }
+
+
+  /*
+   * =====================================================
+   * CART ITEM ACTIONS
+   * =====================================================
+   */
+
+  cartItems?.addEventListener(
+    "click",
+    event => {
+
+      const target =
+        event.target.closest(
+          "button"
+        );
+
+
+      if (!target) {
+        return;
+      }
+
+
+      const index =
+        Number(
+          target.dataset.index
+        );
+
+
+      if (
+        !Number.isInteger(index)
+      ) {
+
+        return;
+
+      }
+
+
+      const cart =
+        normalizeCart(
+          getCart()
+        );
+
+
+      if (!cart[index]) {
+        return;
+      }
+
+
+      /*
+       * =================================================
+       * DECREASE
+       * =================================================
+       */
+
+      if (
+        target.classList.contains(
+          "quantity-minus"
+        )
+      ) {
+
+        cart[index].quantity =
+          Math.max(
+            1,
+            Number(
+              cart[index].quantity || 1
+            ) - 1
+          );
+
+
+        saveCart(cart);
+
+        renderCart();
+
+        return;
+
+      }
+
+
+      /*
+       * =================================================
+       * INCREASE
+       * =================================================
+       */
+
+      if (
+        target.classList.contains(
+          "quantity-plus"
+        )
+      ) {
+
+        cart[index].quantity =
+          Number(
+            cart[index].quantity || 1
+          ) + 1;
+
+
+        saveCart(cart);
+
+        renderCart();
+
+        return;
+
+      }
+
+
+      /*
+       * =================================================
+       * REMOVE
+       * =================================================
+       */
+
+      if (
+        target.classList.contains(
+          "remove-item"
+        )
+      ) {
+
+        cart.splice(
+          index,
+          1
+        );
+
+
+        saveCart(cart);
+
+        renderCart();
+
+      }
+
+    }
+  );
+
+
+  /*
+   * =====================================================
+   * CHECKOUT
+   * =====================================================
+   */
+
+  checkoutButton?.addEventListener(
+    "click",
+    () => {
+
+      const cart =
+        normalizeCart(
+          getCart()
+        );
+
+
+      if (!cart.length) {
+
+        renderCart();
+
+        return;
+
+      }
+
+
+      /*
+       * Pastikan cart terbaru.
+       */
+
+      localStorage.setItem(
+        CART_KEY,
+        JSON.stringify(cart)
+      );
+
+
+      /*
+       * Jangan hapus cart DI SINI.
+       *
+       * Cart baru dihapus setelah
+       * checkout benar-benar sukses.
+       */
+
+      window.location.href =
+        "/product/checkout/";
+
+    }
+  );
+
+
+  /*
+   * =====================================================
+   * CART UPDATED EVENT
+   * =====================================================
+   */
+
+  window.addEventListener(
+    "cartUpdated",
+    () => {
+
+      renderCart();
+
+    }
+  );
+
+
+  /*
+   * =====================================================
+   * STORAGE EVENT
+   * =====================================================
+   *
+   * Berguna ketika cart diubah
+   * dari tab/browser lain.
+   */
+
+  window.addEventListener(
+    "storage",
+    event => {
+
+      if (
+        event.key === CART_KEY
+      ) {
+
+        renderCart();
+
+      }
+
+    }
+  );
+
+
+  /*
+   * =====================================================
+   * INITIAL RENDER
+   * =====================================================
+   */
+
+  renderCart();
+
+})();
+
+</script>
+
+
+<style is:global>
+
+/* =========================================================
+   CART PAGE
+========================================================= */
+
+.cart-page{
+  min-height:70vh;
+  padding:40px 20px 80px;
+}
+
+
+.cart-container{
+  width:min(1200px,100%);
+  margin:0 auto;
+}
+
+
+/* =========================================================
+   CART HEADER
+========================================================= */
+
+.cart-header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:30px;
+  margin-bottom:30px;
+}
+
+
+.cart-label{
+  display:block;
+  margin-bottom:8px;
+  color:var(--primary);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+
+
+.cart-header h1{
+  margin:0;
+  color:var(--text);
+  font-size:clamp(30px,5vw,46px);
+  line-height:1.1;
+}
+
+
+.cart-header p{
+  margin:10px 0 0;
+  color:var(--text-secondary);
+  font-size:14px;
+}
+
+
+.continue-shopping{
+  flex:none;
+  color:var(--primary);
+  font-size:13px;
+  font-weight:700;
+  text-decoration:none;
+}
+
+
+.continue-shopping:hover{
+  text-decoration:underline;
+}
+
+
+/* =========================================================
+   LAYOUT
+========================================================= */
+
+.cart-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 360px;
+  gap:24px;
+  align-items:start;
+}
+
+
+.cart-items{
+  min-width:0;
+}
+
+
+/* =========================================================
+   CART ITEM
+========================================================= */
+
+.cart-item{
+  position:relative;
+
+  display:grid;
+
+  grid-template-columns:
+    120px
+    minmax(0,1fr)
+    auto;
+
+  gap:18px;
+
+  padding:18px;
+  margin-bottom:14px;
+
+  background:var(--surface);
+
+  border:1px solid var(--border);
+
+  border-radius:var(--radius-lg);
+
+  box-shadow:var(--shadow);
+
+  transition:
+    border-color .2s ease,
+    transform .2s ease;
+}
+
+
+.cart-item:hover{
+  border-color:var(--primary);
+  transform:translateY(-1px);
+}
+
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.cart-product-image{
+  width:120px;
+  height:120px;
+
+  overflow:hidden;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:
+    radial-gradient(
+      circle at center,
+      color-mix(
+        in srgb,
+        var(--primary) 7%,
+        transparent
+      ),
+      transparent 70%
+    ),
+    var(--surface-hover);
+
+  border-radius:14px;
+}
+
+
+.cart-product-image img{
+  width:100%;
+  height:100%;
+
+  padding:12px;
+
+  object-fit:contain;
+}
+
+
+/* =========================================================
+   PRODUCT INFO
+========================================================= */
+
+.cart-product-info{
+  min-width:0;
+}
+
+
+.cart-product-category{
+  margin-bottom:6px;
+
+  color:var(--primary);
+
+  font-size:10px;
+  font-weight:800;
+
+  letter-spacing:1px;
+
+  text-transform:uppercase;
+}
+
+
+.cart-product-info h2{
+  margin:0 0 8px;
+
+  font-size:18px;
+  line-height:1.35;
+}
+
+
+.cart-product-info h2 a{
+  color:var(--text);
+  text-decoration:none;
+}
+
+
+.cart-product-info h2 a:hover{
+  color:var(--primary);
+}
+
+
+.cart-product-price{
+  color:var(--text-secondary);
+  font-size:13px;
+}
+
+
+/* =========================================================
+   ITEM BOTTOM
+========================================================= */
+
+.cart-item-bottom{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  margin-top:20px;
+}
+
+
+/* =========================================================
+   QUANTITY
+========================================================= */
+
+.cart-quantity{
+  display:flex;
+  align-items:center;
+
+  height:38px;
+
+  overflow:hidden;
+
+  border:1px solid var(--border);
+  border-radius:9px;
+
+  background:var(--surface);
+}
+
+
+.cart-quantity button{
+  width:36px;
+  height:100%;
+
+  border:0;
+
+  background:transparent;
+
+  color:var(--text);
+
+  font-size:17px;
+
+  cursor:pointer;
+}
+
+
+.cart-quantity button:hover{
+  background:var(--surface-hover);
+  color:var(--primary);
+}
+
+
+.cart-quantity span{
+  min-width:34px;
+
+  text-align:center;
+
+  color:var(--text);
+
+  font-size:13px;
+  font-weight:700;
+}
+
+
+/* =========================================================
+   REMOVE
+========================================================= */
+
+.remove-item{
+  border:0;
+  padding:5px 0;
+
+  background:none;
+
+  color:var(--text-secondary);
+
+  font-size:12px;
+
+  cursor:pointer;
+}
+
+
+.remove-item:hover{
+  color:#d93025;
+}
+
+
+/* =========================================================
+   ITEM TOTAL
+========================================================= */
+
+.cart-item-total{
+  align-self:start;
+
+  color:var(--text);
+
+  font-size:16px;
+  font-weight:800;
+
+  white-space:nowrap;
+}
+
+
+/* =========================================================
+   SUMMARY
+========================================================= */
+
+.cart-summary{
+  position:sticky;
+  top:24px;
+
+  padding:24px;
+
+  background:var(--surface);
+
+  border:1px solid var(--border);
+
+  border-radius:var(--radius-lg);
+
+  box-shadow:var(--shadow);
+}
+
+
+.cart-summary h2{
+  margin:0 0 22px;
+
+  color:var(--text);
+
+  font-size:20px;
+}
+
+
+/* =========================================================
+   SUMMARY ROW
+========================================================= */
+
+.summary-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:15px;
+
+  margin-bottom:14px;
+
+  color:var(--text-secondary);
+
+  font-size:13px;
+}
+
+
+.summary-row strong{
+  color:var(--text);
+  font-size:13px;
+}
+
+
+.summary-row .free{
+  color:var(--primary);
+  font-weight:800;
+}
+
+
+/* =========================================================
+   DIVIDER
+========================================================= */
+
+.summary-divider{
+  height:1px;
+  margin:20px 0;
+  background:var(--border);
+}
+
+
+/* =========================================================
+   TOTAL
+========================================================= */
+
+.summary-total{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+
+
+.summary-total span{
+  color:var(--text);
+  font-size:15px;
+  font-weight:700;
+}
+
+
+.summary-total strong{
+  color:var(--text);
+  font-size:22px;
+  font-weight:900;
+}
+
+
+/* =========================================================
+   CHECKOUT BUTTON
+========================================================= */
+
+.checkout-button{
+  width:100%;
+  height:52px;
+
+  margin-top:22px;
+
+  border:0;
+  border-radius:10px;
+
+  background:var(--bgbtn);
+  color:var(--textbtn);
+
+  font-size:13px;
+  font-weight:800;
+
+  cursor:pointer;
+
+  transition:
+    transform .2s ease,
+    filter .2s ease;
+}
+
+
+.checkout-button:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.08);
+}
+
+
+.checkout-button:active{
+  transform:translateY(0);
+}
+
+
+/* =========================================================
+   SECURE CHECKOUT
+========================================================= */
+
+.secure-checkout{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  gap:7px;
+
+  margin-top:14px;
+
+  color:var(--text-secondary);
+
+  font-size:11px;
+}
+
+
+.secure-checkout span{
+  color:var(--primary);
+  font-weight:900;
+}
+
+
+/* =========================================================
+   EMPTY CART
+========================================================= */
+
+.cart-empty{
+  padding:70px 30px;
+
+  text-align:center;
+
+  background:var(--surface);
+
+  border:1px solid var(--border);
+
+  border-radius:var(--radius-lg);
+
+  box-shadow:var(--shadow);
+}
+
+
+.empty-icon{
+  width:64px;
+  height:64px;
+
+  margin:0 auto 18px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--surface-hover);
+
+  border-radius:50%;
+
+  color:var(--primary);
+}
+
+
+.empty-icon svg{
+  width:30px;
+  height:30px;
+}
+
+
+.cart-empty h2{
+  margin:0;
+
+  color:var(--text);
+
+  font-size:22px;
+}
+
+
+.cart-empty p{
+  margin:8px 0 22px;
+
+  color:var(--text-secondary);
+
+  font-size:13px;
+}
+
+
+.empty-button{
+  display:inline-flex;
+
+  align-items:center;
+  justify-content:center;
+
+  height:44px;
+
+  padding:0 20px;
+
+  background:var(--bgbtn);
+  color:var(--textbtn);
+
+  border-radius:10px;
+
+  text-decoration:none;
+
+  font-size:13px;
+  font-weight:700;
+}
+
+
+.empty-button:hover{
+  filter:brightness(1.08);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:950px){
+
+  .cart-layout{
+    grid-template-columns:1fr;
+  }
+
+
+  .cart-summary{
+    position:static;
+  }
+
+}
+
+
+@media(max-width:650px){
+
+  .cart-page{
+    padding:25px 12px 60px;
+  }
+
+
+  .cart-header{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:15px;
+  }
+
+
+  .cart-item{
+    grid-template-columns:
+      90px
+      minmax(0,1fr);
+
+    gap:13px;
+    padding:13px;
+  }
+
+
+  .cart-product-image{
+    width:90px;
+    height:90px;
+  }
+
+
+  .cart-item-total{
+    grid-column:2;
+
+    margin-top:-5px;
+
+    font-size:14px;
+  }
+
+
+  .cart-product-info h2{
+    font-size:15px;
+  }
+
+
+  .cart-item-bottom{
+    margin-top:13px;
+    gap:10px;
+  }
+
+}
+
+
+@media(max-width:420px){
+
+  .cart-item{
+    grid-template-columns:
+      75px
+      1fr;
+  }
+
+
+  .cart-product-image{
+    width:75px;
+    height:75px;
+  }
+
+
+  .cart-product-image img{
+    padding:8px;
+  }
+
+
+  .cart-item-total{
+    grid-column:1 / -1;
+  }
+
+}
+
+</style>
+
+</MainLayout>

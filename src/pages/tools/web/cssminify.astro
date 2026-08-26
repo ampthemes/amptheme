@@ -1,0 +1,586 @@
+---
+import MainLayout from "../../../layouts/MainLayout.astro";
+
+export const meta = {
+  title: "🗜️ CSS Minify Online Full HTML Cleaner",
+  description: "Membersihkan CSS Minify yang kemungkinan tidak digunakan tanpa merusak HTML dan CSS. Semua proses berjalan langsung di browser.",
+  category: "Web",
+  featured: true
+};
+---
+
+<MainLayout title={`${meta.title} | AI Mr Ferdy`} description={meta.description} pageCSS={["tools"]}>
+<style>
+.BeautyCSS,
+.MinifiedCSS {
+  width: calc(100% - 30px);
+  max-width: 800px;
+  margin: 0 auto 30px;
+}
+
+.BeautyCSS textarea,
+.MinifiedCSS textarea {
+  width: 100%;
+  height: 150px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  font-size: 16px;
+  resize: none;
+}
+
+.copy-box {
+  margin-top: 8px;
+  text-align: right;
+}
+
+.copy-btn {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.copy-btn:hover {
+  opacity: 0.85;
+}
+
+.copy-btn.copied {
+  background: #16a34a;
+}
+</style>
+
+
+<!-- =========================
+     BEAUTY CSS
+========================= -->
+
+<section class="BeautyCSS">
+
+  <h3>🍈 Beauty CSS</h3>
+
+  <p class="langEn">
+    MASUKAN CSS
+  </p>
+
+  <textarea
+    rows="5"
+    id="txt1"
+    placeholder="Masukan Code CSS di sini..."
+    oninput="beautyInput()"
+  ></textarea>
+
+  <div class="copy-box">
+    <button
+      type="button"
+      class="copy-btn"
+      onclick="resetCSS()"
+    >
+      🔄 Reset
+    </button>
+  </div>
+
+</section>
+
+
+<!-- =========================
+     MINIFIED CSS
+========================= -->
+
+<section class="MinifiedCSS">
+
+  <h3>🍍 HASIL Minified CSS</h3>
+
+  <textarea
+    rows="5"
+    id="txt2"
+    placeholder="Hasil Minified CSS..."
+    oninput="minifiedInput()"
+  ></textarea>
+
+  <div class="copy-box">
+    <button
+      type="button"
+      class="copy-btn"
+      onclick="copyCSS('txt2', this)"
+    >
+      📋 Copy Minified CSS
+    </button>
+  </div>
+
+</section>
+
+
+<!-- =========================
+     FINAL MINIFIED CSS
+========================= -->
+
+<section class="MinifiedCSS">
+
+  <h3>🍍 HASIL Minified CSS</h3>
+
+  <textarea
+    rows="5"
+    id="txt3"
+    placeholder="Hasil Minified CSS..."
+    readonly
+  ></textarea>
+
+  <div class="copy-box">
+    <button
+      type="button"
+      class="copy-btn"
+      onclick="copyCSS('txt3', this)"
+    >
+      📋 Copy Minified CSS
+    </button>
+  </div>
+
+</section>
+
+
+<script>
+
+/* =====================================================
+   SAFE CSS MINIFIER
+===================================================== */
+
+function minifySafe(css) {
+
+  if (!css || !css.trim()) {
+    return '';
+  }
+
+  const strings = [];
+
+  /*
+   * Lindungi string CSS
+   * contoh:
+   * "Open Sans"
+   * "Hello World"
+   */
+  css = css.replace(
+    /(["'])(?:\\.|(?!\1)[^\\])*\1/g,
+    function(match) {
+
+      const index = strings.length;
+
+      strings.push(match);
+
+      return '__CSS_STRING_' + index + '__';
+    }
+  );
+
+
+  /*
+   * Hapus komentar CSS biasa
+   */
+  css = css.replace(
+    /\/\*(?!\!)[\s\S]*?\*\//g,
+    ''
+  );
+
+
+  /*
+   * Semua newline dan whitespace
+   * menjadi satu spasi
+   */
+  css = css.replace(
+    /\s+/g,
+    ' '
+  );
+
+
+  /*
+   * Hapus spasi yang tidak diperlukan
+   * di sekitar karakter CSS
+   */
+  css = css.replace(
+    /\s*([{}:;,>+~])\s*/g,
+    '$1'
+  );
+
+
+  /*
+   * Hapus ; sebelum }
+   */
+  css = css.replace(
+    /;}/g,
+    '}'
+  );
+
+
+  /*
+   * Kembalikan string CSS
+   */
+  css = css.replace(
+    /__CSS_STRING_(\d+)__/g,
+    function(match, index) {
+
+      return strings[index];
+    }
+  );
+
+
+  /*
+   * Pastikan benar-benar 1 baris
+   */
+  return css
+    .replace(/[\r\n]+/g, '')
+    .trim();
+}
+
+
+/* =====================================================
+   CSS BEAUTIFIER
+===================================================== */
+
+function beautifySafe(css) {
+
+  if (!css || !css.trim()) {
+    return '';
+  }
+
+
+  /*
+   * Gunakan cssbeautify jika tersedia
+   */
+  if (typeof cssbeautify === 'function') {
+
+    try {
+
+      return cssbeautify(css, {
+        indent: '    ',
+        openbrace: 'end-of-line',
+        autosemicolon: true
+      });
+
+    } catch (error) {
+
+      console.log(
+        'cssbeautify error:',
+        error
+      );
+
+    }
+  }
+
+
+  /*
+   * Fallback beautifier
+   */
+  let result = '';
+  let indent = 0;
+
+  css = css
+    .replace(/\s+/g, ' ')
+    .trim();
+
+
+  for (
+    let i = 0;
+    i < css.length;
+    i++
+  ) {
+
+    const char = css[i];
+
+
+    if (char === '{') {
+
+      result += ' {\n';
+
+      indent++;
+
+      result +=
+        '    '.repeat(indent);
+
+    }
+
+    else if (char === '}') {
+
+      indent--;
+
+      result =
+        result.trimEnd();
+
+      result += '\n';
+
+      result +=
+        '    '.repeat(
+          Math.max(indent, 0)
+        );
+
+      result += '}';
+
+      if (indent > 0) {
+
+        result += '\n';
+
+        result +=
+          '    '.repeat(indent);
+      }
+
+    }
+
+    else if (char === ';') {
+
+      result += ';\n';
+
+      result +=
+        '    '.repeat(indent);
+
+    }
+
+    else {
+
+      result += char;
+
+    }
+  }
+
+
+  return result.trim();
+}
+
+
+/* =====================================================
+   TXT1 → TXT2 + TXT3
+===================================================== */
+
+function beautyInput() {
+
+  const txt1 =
+    document.getElementById('txt1');
+
+  const txt2 =
+    document.getElementById('txt2');
+
+  const txt3 =
+    document.getElementById('txt3');
+
+
+  /*
+   * Ambil CSS dari TXT1
+   */
+  const minified =
+    minifySafe(txt1.value);
+
+
+  /*
+   * TXT2 = MINIFIED 1 BARIS
+   */
+  txt2.value =
+    minified
+      .replace(/[\r\n]+/g, '');
+
+
+  /*
+   * TXT3 = MINIFIED 1 BARIS
+   */
+  txt3.value =
+    txt2.value;
+}
+
+
+/* =====================================================
+   TXT2 → TXT1 + TXT3
+===================================================== */
+
+function minifiedInput() {
+
+  const txt1 =
+    document.getElementById('txt1');
+
+  const txt2 =
+    document.getElementById('txt2');
+
+  const txt3 =
+    document.getElementById('txt3');
+
+
+  /*
+   * Minify input TXT2
+   */
+  const minified =
+    minifySafe(txt2.value);
+
+
+  /*
+   * TXT2 SELALU 1 BARIS
+   */
+  txt2.value =
+    minified
+      .replace(/[\r\n]+/g, '');
+
+
+  /*
+   * TXT1 = BEAUTY CSS
+   */
+  txt1.value =
+    beautifySafe(txt2.value);
+
+
+  /*
+   * TXT3 = MINIFIED 1 BARIS
+   */
+  txt3.value =
+    txt2.value;
+}
+
+
+/* =====================================================
+   COPY CSS
+===================================================== */
+
+function copyCSS(
+  textareaId,
+  button
+) {
+
+  const textarea =
+    document.getElementById(
+      textareaId
+    );
+
+
+  if (!textarea.value) {
+    return;
+  }
+
+
+  const oldText =
+    button.innerHTML;
+
+
+  function copied() {
+
+    button.innerHTML =
+      '✅ Copied!';
+
+    button.classList.add(
+      'copied'
+    );
+
+
+    setTimeout(
+      function() {
+
+        button.innerHTML =
+          oldText;
+
+        button.classList.remove(
+          'copied'
+        );
+
+      },
+      1500
+    );
+  }
+
+
+  if (
+    navigator.clipboard &&
+    window.isSecureContext
+  ) {
+
+    navigator.clipboard
+      .writeText(textarea.value)
+      .then(copied)
+      .catch(function() {
+
+        fallbackCopy(
+          textarea,
+          copied
+        );
+
+      });
+
+  }
+
+  else {
+
+    fallbackCopy(
+      textarea,
+      copied
+    );
+
+  }
+}
+
+
+/* =====================================================
+   FALLBACK COPY
+===================================================== */
+
+function fallbackCopy(
+  textarea,
+  callback
+) {
+
+  textarea.focus();
+
+  textarea.select();
+
+  textarea.setSelectionRange(
+    0,
+    textarea.value.length
+  );
+
+
+  try {
+
+    document.execCommand(
+      'copy'
+    );
+
+    callback();
+
+  }
+
+  catch (error) {
+
+    console.log(
+      'Copy gagal:',
+      error
+    );
+
+  }
+}
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+function resetCSS() {
+
+  document.getElementById(
+    'txt1'
+  ).value = '';
+
+  document.getElementById(
+    'txt2'
+  ).value = '';
+
+  document.getElementById(
+    'txt3'
+  ).value = '';
+
+
+  /*
+   * Kembalikan fokus ke TXT1
+   */
+  document.getElementById(
+    'txt1'
+  ).focus();
+}
+
+</script>
+</MainLayout>

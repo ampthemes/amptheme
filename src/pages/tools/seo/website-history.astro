@@ -1,0 +1,174 @@
+---
+import MainLayout from "../../../layouts/MainLayout.astro";
+
+const title = "Cek History Website (Wayback Tool)";
+const description = "Cek tampilan website lama dengan timeline interaktif + preview langsung";
+---
+
+<MainLayout 
+  title={title}
+  description={description}
+  pageCSS={["tools"]}>
+
+<div class="history-container">
+
+  <h1>🔍 Cek History Website</h1>
+
+  <div class="search-box">
+    <input id="domain" placeholder="contoh: google.com" />
+    <button id="searchBtn">Cek Sekarang</button>
+  </div>
+
+  <!-- TIMELINE -->
+  <div id="timeline" class="timeline"></div>
+
+  <!-- PREVIEW -->
+  <div class="preview-box">
+    <iframe id="previewFrame"></iframe>
+  </div>
+
+</div>
+
+<script>
+const domainInput = document.getElementById("domain");
+const timeline = document.getElementById("timeline");
+const previewFrame = document.getElementById("previewFrame");
+const searchBtn = document.getElementById("searchBtn");
+
+searchBtn.addEventListener("click", loadHistory);
+
+async function loadHistory(){
+  const domain = domainInput.value.trim();
+
+  if(!domain){
+    timeline.innerHTML = "Masukkan domain dulu";
+    return;
+  }
+
+  timeline.innerHTML = "Loading...";
+
+  try {
+    const res = await fetch(
+      `https://web.archive.org/cdx/search/cdx?url=${encodeURIComponent(domain)}&output=json&limit=20`
+    );
+
+    const data = await res.json();
+
+    if(data.length <= 1){
+      timeline.innerHTML = "Tidak ada data";
+      return;
+    }
+
+    timeline.innerHTML = "";
+
+    data.slice(1).forEach(row => {
+      const ts = row[1];
+      const year = ts.slice(0,4);
+      const month = ts.slice(4,6);
+
+      const item = document.createElement("div");
+      item.className = "time-item";
+
+      item.innerHTML = `
+        <div class="dot"></div>
+        <div class="time-text">${year}-${month}</div>
+      `;
+
+      item.addEventListener("click", () => {
+        loadPreview(domain, ts);
+      });
+
+      timeline.appendChild(item);
+    });
+
+  } catch (err) {
+    timeline.innerHTML = "Gagal mengambil data";
+    console.error(err);
+  }
+}
+
+function loadPreview(domain, ts){
+  previewFrame.src = `https://web.archive.org/web/${ts}/${domain}`;
+}
+</script>
+
+<style>
+.history-container {
+  max-width:1000px;
+  margin:auto;
+  padding:20px;
+}
+
+/* SEARCH */
+.search-box {
+  display:flex;
+  gap:10px;
+  margin:20px 0;
+}
+
+.search-box input {
+  flex:1;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+}
+
+.search-box button {
+  padding:12px 20px;
+  border:none;
+  border-radius:10px;
+  background:var(--accent);
+  color:#fff;
+  cursor:pointer;
+}
+
+/* TIMELINE */
+.timeline {
+  display:flex;
+  overflow-x:auto;
+  gap:15px;
+  padding:10px 0;
+}
+
+.time-item {
+  min-width:80px;
+  text-align:center;
+  cursor:pointer;
+}
+
+.dot {
+  width:10px;
+  height:10px;
+  background:var(--accent);
+  border-radius:50%;
+  margin:auto;
+}
+
+.time-text {
+  font-size:12px;
+  margin-top:5px;
+}
+
+/* PREVIEW */
+.preview-box {
+  margin-top:20px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.preview-box iframe {
+  width:100%;
+  height:500px;
+  border:none;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+  .preview-box iframe {
+    height:400px;
+  }
+}
+</style>
+
+</MainLayout>

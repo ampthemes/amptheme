@@ -1,0 +1,316 @@
+---
+import { SITE } from "../lib/site";
+
+const linkalt = "/";
+
+const blogItems = [
+  { href: "/blog", label: "All Articles" },
+  { href: "/blog/ai", label: "AI" },
+  { href: "/blog/gaming", label: "Gaming" },
+  { href: "/blog/technology", label: "Technology" },
+];
+
+const toolItems = [
+  { href: "/tools", label: "All Tools" },
+  { href: "/tools/ai", label: "AI Tools" },
+  { href: "/tools/gaming", label: "Gaming Tools" },
+  { href: "/tools/android", label: "Android Tools" },
+];
+
+const productItems = [
+  { href: "/product", label: "All Products" },
+  { href: "/product/roboragma", label: "Roboragma APK" },
+  { href: "/product/ai-assistant", label: "AI Assistant" },
+  { href: "/product/gamer-assistant", label: "Gamer Assistant" },
+];
+
+const menus = [
+  { label: "Blog", items: blogItems },
+  { label: "Tools", items: toolItems },
+  { label: "Product", items: productItems },
+];
+---
+
+<header class="header">
+  <div class="header-wrap">
+
+    <!-- MOBILE MENU -->
+    <button
+      class="menu-toggle"
+      id="menuToggle"
+      type="button"
+      aria-label="Buka menu"
+      aria-expanded="false"
+      aria-controls="nav"
+    >
+      ☰
+    </button>
+
+    <!-- LOGO -->
+    <a
+      href={linkalt}
+      class="header-logo"
+      aria-label="AI Mr Ferdy"
+    >
+      AI<span> Mr Ferdy</span>
+    </a>
+
+    <!-- NAVIGATION -->
+    <nav
+      class="nav"
+      id="nav"
+      aria-label="Main navigation"
+    >
+
+      <a href="/">Home</a>
+
+      <a href="https://aimrferdy.com">Ai Mr Ferdy</a>
+
+      {
+        menus.map((menu) => (
+          <div class="dropdown">
+
+            <button
+              class="drop-btn"
+              type="button"
+              aria-expanded="false"
+            >
+              {menu.label}
+
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+
+            <div class="drop-menu">
+
+              {
+                menu.items.map((item) => (
+                  <a href={item.href}>
+                    {item.label}
+                  </a>
+                ))
+              }
+
+            </div>
+
+          </div>
+        ))
+      }
+
+      <a href="/about">About</a>
+
+    </nav>
+
+    <!-- HEADER ACTIONS -->
+    <div class="header-actions">
+
+      <!-- CART -->
+      <a
+        href="/product/cart"
+        class="cart-btn"
+        aria-label="Shopping cart"
+      >
+
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="9" cy="20" r="1"/>
+          <circle cx="18" cy="20" r="1"/>
+          <path d="M3 4h2l2.4 11.5a2 2 0 0 0 2 1.5h7.7a2 2 0 0 0 2-1.5L21 8H6"/>
+        </svg>
+
+        <span
+          class="cart-count"
+          id="cartCount"
+          aria-live="polite"
+        >
+          0
+        </span>
+
+      </a>
+
+      <!-- LOGIN -->
+      <a
+        href="/login"
+        class="header-btn"
+      >
+        Login
+      </a>
+
+      <!-- THEME TOGGLE -->
+      <button
+        class="theme-toggle"
+        id="themeToggle"
+        type="button"
+        aria-label="Ganti tema"
+      >
+
+        <!-- SUN -->
+        <svg
+          class="sun"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2"/>
+          <path d="M12 20v2"/>
+          <path d="M4.93 4.93l1.41 1.41"/>
+          <path d="M17.66 17.66l1.41 1.41"/>
+          <path d="M2 12h2"/>
+          <path d="M20 12h2"/>
+          <path d="M4.93 19.07l1.41-1.41"/>
+          <path d="M17.66 6.34l1.41-1.41"/>
+        </svg>
+
+        <!-- MOON -->
+        <svg
+          class="moon"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path d="M20 14.5A8.5 8.5 0 1 1 12.5 4A7 7 0 0 0 20 14.5z"/>
+        </svg>
+
+      </button>
+
+    </div>
+
+  </div>
+</header>
+
+
+
+<script is:inline>
+
+/* =========================================================
+   CART STORAGE
+========================================================= */
+
+const CART_KEY = 'cart';
+
+
+/* =========================================================
+   UPDATE CART COUNT
+========================================================= */
+
+function updateCartCount(){
+
+  const badge =
+    document.getElementById('cartCount');
+
+  if(!badge) return;
+
+  try{
+
+    const cart =
+      JSON.parse(
+        localStorage.getItem(CART_KEY) || '[]'
+      );
+
+    const count =
+      Array.isArray(cart)
+        ? cart.reduce(
+            (total, item) =>
+              total +
+              Math.max(
+                0,
+                Number(item.quantity || 0)
+              ),
+            0
+          )
+        : 0;
+
+    badge.textContent =
+      count > 99
+        ? '99+'
+        : String(count);
+
+    badge.style.display =
+      count > 0
+        ? 'flex'
+        : 'none';
+
+  }catch(error){
+
+    console.error(
+      'Cart error:',
+      error
+    );
+
+    badge.textContent = '0';
+
+    badge.style.display = 'none';
+
+  }
+
+}
+
+
+/* =========================================================
+   CART EVENTS
+========================================================= */
+
+window.addEventListener(
+  'cartUpdated',
+  updateCartCount
+);
+
+
+window.addEventListener(
+  'storage',
+  (event) => {
+
+    if(event.key === CART_KEY){
+
+      updateCartCount();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   INITIAL CART
+========================================================= */
+
+if(
+  document.readyState === 'loading'
+){
+
+  document.addEventListener(
+    'DOMContentLoaded',
+    updateCartCount,
+    { once:true }
+  );
+
+}else{
+
+  updateCartCount();
+
+}
+
+</script>
+
+

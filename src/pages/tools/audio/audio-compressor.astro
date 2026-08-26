@@ -1,0 +1,201 @@
+---
+import MainLayout from "../../../layouts/MainLayout.astro";
+
+export const meta = {
+  title: "🎧 Audio Compressor",
+  description: "Compress file audio secara online gratis. Kurangi ukuran MP3/WAV dengan mudah langsung di browser.",
+  category: "Audio",
+  featured: true
+};
+---
+
+<MainLayout title={`${meta.title} | AI Mr Ferdy`} description={meta.description} pageCSS={["tool"]}>
+<div class="page-tools">
+<!-- HERO -->
+<section class="tool-hero">
+  <h1>🎧 Audio Compressor</h1>
+  <p>
+    Kurangi ukuran file audio tanpa mengurangi kualitas secara signifikan.
+  </p>
+</section>
+
+<!-- APP -->
+<section class="tool-box">
+
+  <div class="form-group">
+    <label>Upload Audio</label>
+    <input type="file" id="file" accept="audio/*" />
+  </div>
+
+  <div class="form-group">
+    <label>Quality: <span id="qLabel">70%</span></label>
+    <input type="range" id="quality" min="20" max="100" value="70" />
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-primary" onclick="compress()">🎧 Compress Audio</button>
+  </div>
+
+  <!-- INFO -->
+  <div id="info" class="tool-result" style="display:none;"></div>
+
+  <!-- AUDIO PREVIEW -->
+  <audio id="audioPreview" controls style="display:none; width:100%; margin-top:15px;"></audio>
+
+  <!-- DOWNLOAD -->
+  <div id="downloadWrap" style="display:none;">
+    <a id="downloadBtn" class="btn btn-secondary" download="compressed.wav">
+      ⬇️ Download Audio
+    </a>
+  </div>
+
+</section>
+
+<!-- SEO -->
+<section class="tool-seo">
+
+  <h2>Apa Itu Audio Compressor?</h2>
+  <p>
+    Audio compressor adalah alat untuk mengecilkan ukuran file audio
+    dengan menyesuaikan kualitas atau bitrate.
+  </p>
+
+  <h2>Kenapa Perlu Compress Audio?</h2>
+  <ul>
+    <li>Menghemat storage</li>
+    <li>Upload lebih cepat</li>
+    <li>Cocok untuk podcast & musik</li>
+    <li>Mengurangi bandwidth</li>
+  </ul>
+
+</section>
+
+<!-- COLLAPSE -->
+<section class="tool-more">
+
+  <details open>
+    <summary>Cara Menggunakan</summary>
+    <p>
+      Upload audio → atur kualitas → klik compress → download hasil.
+    </p>
+  </details>
+
+  <details>
+    <summary>Catatan</summary>
+    <ul>
+      <li>Hasil berupa WAV (browser limitation)</li>
+      <li>Semakin rendah kualitas, ukuran makin kecil</li>
+      <li>Tidak cocok untuk audio profesional</li>
+    </ul>
+  </details>
+
+</section>
+</div>
+<script is:inline>
+const qualityInput = document.getElementById("quality");
+const qLabel = document.getElementById("qLabel");
+
+qualityInput.addEventListener("input", () => {
+  qLabel.innerText = qualityInput.value + "%";
+});
+
+window.compress = async function(){
+  const file = document.getElementById("file").files[0];
+  const quality = qualityInput.value / 100;
+
+  if(!file){
+    alert("Upload audio dulu!");
+    return;
+  }
+
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const arrayBuffer = await file.arrayBuffer();
+  const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+  // downsample
+  const offlineCtx = new OfflineAudioContext(
+    audioBuffer.numberOfChannels,
+    audioBuffer.length * quality,
+    audioBuffer.sampleRate * quality
+  );
+
+  const source = offlineCtx.createBufferSource();
+  source.buffer = audioBuffer;
+  source.connect(offlineCtx.destination);
+  source.start(0);
+
+  const rendered = await offlineCtx.startRendering();
+
+  const wavBlob = bufferToWav(rendered);
+
+  const url = URL.createObjectURL(wavBlob);
+
+  const originalSize = (file.size / 1024).toFixed(2);
+  const newSize = (wavBlob.size / 1024).toFixed(2);
+  const reduction = ((1 - newSize/originalSize) * 100).toFixed(1);
+
+  document.getElementById("info").style.display = "block";
+  document.getElementById("info").innerHTML = `
+    <strong>Original:</strong> ${originalSize} KB<br>
+    <strong>Compressed:</strong> ${newSize} KB<br>
+    <strong>Reduction:</strong> ${reduction}%
+  `;
+
+  const audioPreview = document.getElementById("audioPreview");
+  audioPreview.src = url;
+  audioPreview.style.display = "block";
+
+  document.getElementById("downloadBtn").href = url;
+  document.getElementById("downloadWrap").style.display = "block";
+};
+
+// convert buffer ke WAV
+function bufferToWav(buffer) {
+  const numOfChan = buffer.numberOfChannels;
+  const length = buffer.length * numOfChan * 2 + 44;
+  const bufferArray = new ArrayBuffer(length);
+  const view = new DataView(bufferArray);
+
+  let offset = 0;
+
+  function writeString(str) {
+    for (let i = 0; i < str.length; i++) {
+      view.setUint8(offset++, str.charCodeAt(i));
+    }
+  }
+
+  writeString("RIFF");
+  view.setUint32(offset, 36 + buffer.length * 2, true); offset += 4;
+  writeString("WAVE");
+  writeString("fmt ");
+  view.setUint32(offset, 16, true); offset += 4;
+  view.setUint16(offset, 1, true); offset += 2;
+  view.setUint16(offset, numOfChan, true); offset += 2;
+  view.setUint32(offset, buffer.sampleRate, true); offset += 4;
+  view.setUint32(offset, buffer.sampleRate * 2, true); offset += 4;
+  view.setUint16(offset, numOfChan * 2, true); offset += 2;
+  view.setUint16(offset, 16, true); offset += 2;
+  writeString("data");
+  view.setUint32(offset, buffer.length * 2, true); offset += 4;
+
+  const channels = [];
+  for (let i = 0; i < numOfChan; i++) {
+    channels.push(buffer.getChannelData(i));
+  }
+
+  let pos = offset;
+
+  for (let i = 0; i < buffer.length; i++) {
+    for (let channel = 0; channel < numOfChan; channel++) {
+      let sample = channels[channel][i];
+      sample = Math.max(-1, Math.min(1, sample));
+      view.setInt16(pos, sample * 0x7fff, true);
+      pos += 2;
+    }
+  }
+
+  return new Blob([view], { type: "audio/wav" });
+}
+</script>
+
+</MainLayout>

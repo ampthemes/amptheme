@@ -1,0 +1,491 @@
+---
+import { SITE } from "../lib/site";
+import { getFooterData } from "../lib/footer-data";
+
+const {
+  latestPosts,
+  popularTools,
+  featuredProducts
+} = await getFooterData();
+---
+
+<!-- FOOTER -->
+<footer class="footer-modern">
+  <div class="container">
+
+    <div class="footer-grid">
+
+      <!-- LATEST POSTS -->
+      <div class="footer-links latest">
+        <p class="footer-title">Latest Posts</p>
+
+        {latestPosts.map((post) => (
+          <a href={`/blog/${post.slug}/`}>
+            {post.data.title}
+          </a>
+        ))}
+      </div>
+
+      <!-- POPULAR TOOLS -->
+      <div class="footer-links popular">
+        <p class="footer-title">Popular Tools</p>
+
+        {popularTools.map((tool) => (
+          <a href={`/tools/${tool.slug}/`}>
+            {tool.data.title}
+          </a>
+        ))}
+
+
+<p class="footer-title">Featured Products</p>
+
+        {featuredProducts.map((product) => (
+          <a href={`/product/${product.slug}/`}>
+            {product.data.title}
+          </a>
+        ))}
+      </div>
+
+      <!-- FEATURED PRODUCTS 
+      <div class="footer-links">
+        <h4>Featured Products</h4>
+
+        {featuredProducts.map((product) => (
+          <a href={`/product/${product.slug}/`}>
+            {product.data.title}
+          </a>
+        ))}
+      </div>-->
+
+
+   <!-- COMPANY -->
+<div class="footer-service">
+  <div class="footer-col">
+    <p class="footer-title">Company</p>
+
+    <a href="/about">About</a>
+    <!-- <a href="/services">Services</a> -->
+    <a href="/pricing">Pricing</a>
+    <a href="/contact">Contact</a>
+  </div>
+
+  <div class="footer-col">
+    <a href="/terms">Terms</a>
+    <a href="/disclaimer">Disclaimer</a>
+    <a href="/faq">Faq</a>
+    <a href="/tos">Tos</a>
+  </div>
+</div>
+
+
+
+      <!-- ABOUT -->
+      <div class="footer-about">
+        <p class="footer-brand">AI Mr Ferdy</p>
+
+        <p>
+         Platform AI Indonesia yang menyediakan berbagai AI tools, panduan, dan sumber daya untuk membantu individu maupun bisnis memanfaatkan kecerdasan buatan secara lebih mudah.
+        </p>
+
+        <p>
+		📍 Jakarta, Indonesia <br/> 
+		✉️ hello@aimrferdy.com
+		</p>
+
+        
+<p>
+  <a
+    href="https://www.dmca.com/Protection/Status.aspx?ID=ad07e0ec-05fb-415a-80cc-0c9cf66f816e&amp;refurl=https://www.aimrferdy.com/"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="DMCA Protected"
+  >
+    <img
+      src="https://images.dmca.com/Badges/dmca-badge-w100-5x1-01.png"
+      alt="DMCA Protected"
+      width="60"
+      height="12"
+      loading="lazy"
+    />
+  </a>
+</p>
+
+      </div>
+
+
+
+    </div>
+
+    <div class="footer-bottom">
+
+<div class="footer-social">
+  <!-- Instagram -->
+  <a href="https://www.instagram.com/aimrferdyofficial" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+    <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+      <path d="M7.75 2C4.57 2 2 4.57 2 7.75v8.5C2 19.43 4.57 22 7.75 22h8.5C19.43 22 22 19.43 22 16.25v-8.5C22 4.57 19.43 2 16.25 2h-8.5zm0 2h8.5A3.75 3.75 0 0 1 20 7.75v8.5A3.75 3.75 0 0 1 16.25 20h-8.5A3.75 3.75 0 0 1 4 16.25v-8.5A3.75 3.75 0 0 1 7.75 4zm8.75 1a1.25 1.25 0 1 0 0 2.5A1.25 1.25 0 0 0 16.5 5zM12 7a5 5 0 1 0 0 10a5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6a3 3 0 0 1 0-6z"/>
+    </svg>
+  </a>
+
+  <!-- Medium -->
+  <a href="https://medium.com/@aimrferdy" target="_blank" rel="noopener noreferrer" aria-label="Medium">
+    <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+      <path d="M2 6.5l2.2 2.8v8.2L2 20v.5h6V20l-2-2.5V9.7l5 10.8h.7l4.3-10.8v9.7L14 20v.5h8V20l-1.8-1.7V7.7L22 6V5.5h-5.7l-4 9.8L8.8 5.5H2z"/>
+    </svg>
+  </a>
+
+  <!-- GitHub -->
+  <a href="https://github.com/aimrfredy" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+    <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+      <path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.11.79-.25.79-.56v-2.15c-3.2.69-3.88-1.54-3.88-1.54c-.52-1.33-1.28-1.69-1.28-1.69c-1.05-.72.08-.7.08-.7c1.16.08 1.77 1.19 1.77 1.19c1.03 1.77 2.7 1.26 3.36.97c.1-.75.4-1.26.73-1.55c-2.55-.29-5.23-1.28-5.23-5.68c0-1.25.45-2.28 1.18-3.08c-.12-.29-.51-1.46.11-3.05c0 0 .97-.31 3.18 1.18a10.98 10.98 0 0 1 5.8 0c2.21-1.49 3.18-1.18 3.18-1.18c.62 1.59.23 2.76.11 3.05c.73.8 1.18 1.83 1.18 3.08c0 4.41-2.69 5.39-5.25 5.67c.41.35.78 1.05.78 2.12v3.14c0 .31.21.68.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/>
+    </svg>
+  </a>
+
+  <!-- YouTube -->
+  <a href="https://www.youtube.com/@ai-mr-ferdy" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+    <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+      <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2A31.7 31.7 0 0 0 0 12a31.7 31.7 0 0 0 .5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.7 31.7 0 0 0 24 12a31.7 31.7 0 0 0-.5-5.8zM9.6 15.5v-7L16 12l-6.4 3.5z"/>
+    </svg>
+  </a>
+
+  <!-- X -->
+  <a href="https://x.com/ai_mr_ferdy" target="_blank" rel="noopener noreferrer" aria-label="X">
+    <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+      <path d="M18.9 2H22l-6.8 7.8L23 22h-6.1l-4.8-6.3L6.6 22H3.5l7.2-8.2L1 2h6.2l4.3 5.7L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z"/>
+    </svg>
+  </a>
+
+
+<a href="https://web.facebook.com/ai.mr.ferdy" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+  <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+    <path d="M13.5 22v-8h2.7l.4-3h-3.1V9.1c0-.9.3-1.6 1.6-1.6h1.7V4.8c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.2V11H8v3h2.4v8h3.1z"/>
+  </svg>
+</a>
+
+<a href="https://heylink.me/mrferdy" target="_blank" rel="noopener noreferrer" aria-label="HeyLink">
+  <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
+    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+    <path d="M8 8v8M8 12h4M12 8v8M16 8v8h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+</a>
+
+</div>
+
+      <p>
+        © {new Date().getFullYear()} {SITE.name}
+      </p>
+    </div>
+
+  </div>
+</footer>
+
+
+
+<style>
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+  margin-top:80px;
+  padding:40px 20px;
+
+  border-top:1px solid var(--border);
+
+  text-align:left;
+  color:var(--muted);
+
+  font-size:14px;
+}
+
+/* =========================
+   FOOTER MODERN
+========================= */
+
+.footer-modern{
+  padding:80px 0 26px;
+
+  border-top:1px solid var(--border);
+
+  /* FIX LIGHT/DARK */
+  background:var(--bg-secondary);
+
+  overflow:hidden;
+}
+
+/* =========================
+   CONTAINER
+========================= */
+
+.footer-modern .container{
+  width:100%;
+  max-width:1200px;
+
+  margin:auto;
+  padding:0 20px;
+
+  box-sizing:border-box;
+}
+
+/* =========================
+   GRID LAYOUT
+========================= */
+
+.footer-grid{
+  display:grid;
+
+  /* Latest | Popular | Service | About */
+  grid-template-columns:
+    minmax(0, 1.4fr)
+    minmax(0, 1.4fr)
+    minmax(0, 0.6fr)
+    minmax(0, 1.3fr);
+
+  gap:40px;
+
+  width:100%;
+  align-items:flex-start;
+}
+
+/* IMPORTANT FIX */
+.footer-grid > *{
+  min-width:0;
+}
+
+/* =========================
+   ABOUT
+========================= */
+
+.footer-brand{
+  margin:0 0 20px;
+  font-size:18px;
+  font-weight:700;
+  line-height:1.2;
+  letter-spacing:1px;
+  color:var(--text);
+}
+
+.footer-about p{
+  color:var(--text-soft);
+
+  font-size:15px;
+  line-height:1.9;
+
+  margin-bottom:16px;
+
+  overflow-wrap:break-word;
+}
+
+/* =========================
+   TITLES
+========================= */
+
+.footer-title{
+  margin:0 0 18px;
+  font-size:18px;
+  font-weight:700;
+  line-height:1.3;
+  color:var(--text);
+}
+
+.footer-title:not(:first-child){
+  margin-top:28px;
+}
+
+/* =========================
+   LINKS
+========================= */
+
+.footer-service a,
+.footer-links a{
+  display:block;
+
+  color:var(--text-soft);
+  text-decoration:none;
+
+  font-size:15px;
+  line-height:1.7;
+
+  overflow-wrap:break-word;
+  word-break:break-word;
+
+  transition:
+    transform .2s ease,
+    opacity .2s ease,
+    color .2s ease;
+}
+
+/* company/social spacing */
+
+.footer-service a{
+  margin-bottom:10px;
+}
+
+/* latest/popular spacing */
+
+.footer-links{
+  display:flex;
+  flex-direction:column;
+}
+
+.footer-links a{
+  margin-bottom:16px;
+
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* hover */
+
+.footer-service a:hover,
+.footer-links a:hover{
+  color:var(--text);
+
+  opacity:1;
+
+  transform:translateX(4px);
+}
+
+/* =========================
+   FOOTER BOTTOM
+========================= */
+
+.footer-bottom{
+  margin-top:70px;
+  padding-top:26px;
+
+  border-top:1px solid var(--border);
+
+  text-align:center;
+
+  color:var(--text-soft);
+  font-size:14px;
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media(max-width:1024px){
+
+  .footer-grid{
+    grid-template-columns:1fr 1fr;
+    gap:42px 28px;
+  }
+
+  .footer-about{
+    grid-column:1/-1;
+  }
+
+}
+
+/* =========================
+   SERVICE
+========================= */
+
+.footer-service{
+  display:block;
+}
+
+/* =========================
+   MOBILE SERVICE GRID
+========================= */
+
+@media(max-width:640px){
+
+  .footer-service{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+  }
+
+  .footer-col h4{
+    margin-bottom:14px;
+  }
+
+  .footer-col a{
+    font-size:14px;
+    margin-bottom:10px;
+  }
+
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:640px){
+
+  .footer-modern{
+    padding:60px 0 24px;
+  }
+
+  .footer-modern .container{
+    padding:0 18px;
+  }
+
+  .footer-grid{
+    grid-template-columns:1fr;
+    gap:36px;
+  }
+
+  .footer-about h3{
+    font-size:28px;
+  }
+
+  .footer-about p{
+    font-size:14px;
+    line-height:1.8;
+  }
+
+  .footer-service h4,
+  .footer-links h4{
+    font-size:17px;
+    margin-bottom:16px;
+  }
+
+  .footer-service a,
+  .footer-links a{
+    font-size:14px;
+  }
+
+  .footer-bottom{
+    margin-top:50px;
+    font-size:13px;
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.footer-social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color, #94a3b8);
+  transition: all .2s ease;
+}
+
+.footer-social a:hover {
+  color: var(--accent-color, #3b82f6);
+  transform: translateY(-2px);
+}
+</style>
+

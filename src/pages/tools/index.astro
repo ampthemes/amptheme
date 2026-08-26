@@ -1,0 +1,448 @@
+---
+import MainLayout from "../../layouts/MainLayout.astro";
+import { SITE } from "../../lib/site";
+import "../../styles/tools.css";
+
+/* =========================================================
+   LOAD ALL TOOLS
+========================================================= */
+
+const modules = Object.entries(
+  import.meta.glob("./**/*.astro", {
+    eager: true
+  })
+);
+
+
+/* =========================================================
+   BUILD TOOL LIST
+========================================================= */
+
+const tools = modules
+  .map(([file, mod]) => {
+
+    const match = file.match(
+      /^\.\/([^/]+)\/(.+)\.astro$/
+    );
+
+    if (!match) {
+      return null;
+    }
+
+    const category = match[1];
+    const slug = match[2];
+
+    if (
+      category === "[category]" ||
+      slug === "index"
+    ) {
+      return null;
+    }
+
+    if (!mod.meta) {
+      return null;
+    }
+
+    return {
+      ...mod.meta,
+      category,
+      slug,
+      url: `/tools/${category}/${slug}/`
+    };
+  })
+  .filter(Boolean)
+  .sort((a, b) =>
+    (a.title || "").localeCompare(
+      b.title || "",
+      "id"
+    )
+  );
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+const totalTools = tools.length;
+
+const totalCategories =
+  new Set(
+    tools.map(tool => tool.category)
+  ).size;
+
+
+/* =========================================================
+   SEO
+========================================================= */
+
+const pageUrl = SITE.url("/tools/");
+
+const jsonLd = {
+  "@context": "https://schema.org",
+
+  "@type": "CollectionPage",
+
+  name: `Tools | ${SITE.title}`,
+
+  description:
+    "Kumpulan AI tools dan utility online yang dapat digunakan langsung dari browser.",
+
+  url: pageUrl,
+
+  mainEntity: {
+    "@type": "ItemList",
+
+    numberOfItems: totalTools,
+
+    itemListElement: tools.map((tool, index) => ({
+      "@type": "ListItem",
+
+      position: index + 1,
+
+      name: tool.title,
+
+      url: SITE.url(tool.url)
+    }))
+  }
+};
+---
+
+<MainLayout
+  title={`Tools | ${SITE.title}`}
+  description="Kumpulan AI tools dan utility online yang dapat digunakan langsung dari browser."
+>
+
+  <section class="tools-page">
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <div class="tools-hero">
+
+      <span class="tools-hero-label">
+        AI TOOLS
+      </span>
+
+      <h1>
+        Tools Online
+      </h1>
+
+      <p>
+        Kumpulan AI tools dan utility online
+        yang dapat digunakan langsung dari browser.
+      </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         STATS
+    ====================================================== -->
+
+    <section
+      class="tools-stats"
+      aria-label="Statistik tools"
+    >
+
+      <div class="tools-stat-item">
+
+        <strong>
+          {totalTools}
+        </strong>
+
+        <span>
+          Tools
+        </span>
+
+      </div>
+
+
+      <div class="tools-stat-item">
+
+        <strong>
+          {totalCategories}
+        </strong>
+
+        <span>
+          Kategori
+        </span>
+
+      </div>
+
+
+      <div class="tools-stat-item">
+
+        <strong>
+          100%
+        </strong>
+
+        <span>
+          Gratis
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SEARCH
+    ====================================================== -->
+
+    <div class="tools-search">
+
+      <label
+        for="toolSearch"
+        class="tools-search-label"
+      >
+        Cari tools
+      </label>
+
+      <input
+        id="toolSearch"
+        class="tools-search-input"
+        type="search"
+        placeholder="Cari tools..."
+        autocomplete="off"
+        spellcheck="false"
+      />
+
+    </div>
+
+
+    <!-- =====================================================
+         TOOL LIST
+    ====================================================== -->
+
+    {
+      tools.length > 0 ? (
+
+        <section
+          class="tools-section"
+          aria-labelledby="tools-title"
+        >
+
+          <div class="tools-section-heading">
+
+            <h2 id="tools-title">
+              Semua Tools
+            </h2>
+
+            <span class="tools-count">
+              {totalTools} tools
+            </span>
+
+          </div>
+
+
+          <div
+            id="toolsGrid"
+            class="tools-grid"
+          >
+
+            {
+              tools.map((tool) => (
+
+                <article
+                  class="tools-card"
+                  data-search={`
+                    ${tool.title || ""}
+                    ${tool.description || ""}
+                    ${tool.category || ""}
+                  `}
+                >
+
+                  {
+                    tool.featured && (
+
+                      <span class="tools-badge">
+                        HOT
+                      </span>
+
+                    )
+                  }
+
+
+                  {
+                    tool.icon && (
+
+                      <div
+                        class="tools-icon"
+                        aria-hidden="true"
+                      >
+                        {tool.icon}
+                      </div>
+
+                    )
+                  }
+
+
+                  <div class="tools-category">
+
+                    {
+                      tool.category
+                        .replace(/[-_]/g, " ")
+                        .replace(/\b\w/g, char =>
+                          char.toUpperCase()
+                        )
+                    }
+
+                  </div>
+
+
+                  <h3 class="tools-card-title">
+
+                    <a href={tool.url}>
+                      {tool.title}
+                    </a>
+
+                  </h3>
+
+
+                  {
+                    tool.description && (
+
+                      <p class="tools-card-description">
+                        {tool.description}
+                      </p>
+
+                    )
+                  }
+
+
+                  <a
+                    href={tool.url}
+                    class="tools-button"
+                    aria-label={`Buka ${tool.title}`}
+                  >
+                    Buka Tool
+
+                    <span aria-hidden="true">
+                      →
+                    </span>
+
+                  </a>
+
+                </article>
+
+              ))
+            }
+
+          </div>
+
+
+          <!-- =================================================
+               EMPTY SEARCH
+          ================================================== -->
+
+          <div
+            id="emptyState"
+            class="tools-empty"
+            hidden
+          >
+
+            <strong>
+              Tool tidak ditemukan
+            </strong>
+
+            <p>
+              Coba gunakan kata kunci pencarian lainnya.
+            </p>
+
+          </div>
+
+        </section>
+
+      ) : (
+
+        <div class="tools-empty">
+
+          <strong>
+            Belum ada tools
+          </strong>
+
+          <p>
+            Belum ada file tool yang tersedia.
+          </p>
+
+        </div>
+
+      )
+    }
+
+  </section>
+
+
+  <!-- =======================================================
+       SEARCH SCRIPT
+  ======================================================== -->
+
+  <script>
+
+    const searchInput =
+      document.querySelector("#toolSearch");
+
+    const cards =
+      document.querySelectorAll(".tools-card");
+
+    const emptyState =
+      document.querySelector("#emptyState");
+
+
+    searchInput?.addEventListener(
+      "input",
+      () => {
+
+        const query =
+          searchInput.value
+            .toLowerCase()
+            .trim();
+
+        let visible = 0;
+
+
+        cards.forEach((card) => {
+
+          const text =
+            card.dataset.search ||
+            card.textContent ||
+            "";
+
+          const match =
+            text
+              .toLowerCase()
+              .includes(query);
+
+          card.hidden = !match;
+
+          if (match) {
+            visible++;
+          }
+
+        });
+
+
+        if (emptyState) {
+
+          emptyState.hidden =
+            visible !== 0;
+
+        }
+
+      }
+    );
+
+  </script>
+
+
+  <!-- =======================================================
+       JSON-LD
+  ======================================================== -->
+
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd)}
+  />
+
+</MainLayout>

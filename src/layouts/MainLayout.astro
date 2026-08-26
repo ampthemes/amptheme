@@ -1,0 +1,413 @@
+---
+import "../styles/global.css";
+import toolsCSS from "../styles/tools.css?url";
+
+import SeoHead from "../components/SeoHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+
+import { generateFaqSchema } from "../lib/faq-schema";
+import { homeSchema } from "../lib/home-schema";
+
+
+const {
+  title,
+  description,
+  canonical,
+  html = "",
+  articleSchema,
+  breadcrumbs,
+  amp,
+  slug,
+  isHome = false,
+  pageCSS = []
+} = Astro.props;
+
+
+/* =====================================
+   PATHNAME
+===================================== */
+
+const pathname = Astro.url.pathname;
+
+
+/* =====================================
+   PAGE CSS
+===================================== */
+
+const cssMap = {
+  tools: toolsCSS
+};
+
+const autoPageCSS = [...pageCSS];
+
+
+/*
+ * Semua halaman /tools otomatis
+ * menggunakan tools.css
+ */
+
+if (
+  pathname.startsWith("/tools") &&
+  !autoPageCSS.includes("tools")
+) {
+  autoPageCSS.push("tools");
+}
+
+
+/* =====================================
+   AUTO BREADCRUMBS
+===================================== */
+
+const autoBreadcrumbs =
+  breadcrumbs ??
+  (
+    pathname.startsWith("/tools")
+      ? (() => {
+
+          const parts = pathname
+            .split("/")
+            .filter(Boolean);
+
+          const items = [
+            {
+              name: "Home",
+              url: "/"
+            }
+          ];
+
+          let path = "";
+
+          for (const part of parts) {
+
+            path += `/${part}`;
+
+            items.push({
+              name: part
+                .replace(/-/g, " ")
+                .replace(/\b\w/g, (c) =>
+                  c.toUpperCase()
+                ),
+              url: path
+            });
+
+          }
+
+          return items;
+
+        })()
+      : breadcrumbs
+  );
+
+
+/* =====================================
+   FAQ SCHEMA
+===================================== */
+
+const faqSchema =
+  generateFaqSchema(html);
+
+---
+
+<!doctype html>
+
+<html lang="id">
+
+<head>
+
+  <SeoHead
+    title={title}
+    description={description}
+    canonical={canonical}
+    articleSchema={articleSchema}
+    breadcrumbs={autoBreadcrumbs}
+    faqSchema={faqSchema}
+    amp={amp}
+    slug={slug}
+    isHome={isHome}
+  />
+
+
+  <!-- =================================
+       PAGE CSS
+  ================================== -->
+
+  {
+    autoPageCSS.map((css) => (
+      cssMap[css] && (
+        <link
+          rel="stylesheet"
+          href={cssMap[css]}
+        />
+      )
+    ))
+  }
+
+
+  <!-- =================================
+       HOME SCHEMA
+  ================================== -->
+
+  {
+    isHome && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify(homeSchema)}
+      />
+    )
+  }
+
+
+  <!-- =================================
+       THEME INITIALIZATION
+  ================================== -->
+
+  <script is:inline>
+
+    (() => {
+
+      const savedTheme =
+        localStorage.getItem("theme");
+
+      const systemTheme =
+        window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches
+          ? "dark"
+          : "light";
+
+      document.documentElement.dataset.theme =
+        savedTheme || systemTheme;
+
+    })();
+
+  </script>
+
+</head>
+
+
+<body>
+
+  <Header />
+
+
+  <main>
+
+
+    <!-- =================================
+         TOOLS BREADCRUMB
+    ================================== -->
+
+    {
+      pathname.startsWith("/tools") &&
+      autoBreadcrumbs &&
+      autoBreadcrumbs.length > 1 && (
+
+        <nav
+          class="breadcrumb"
+          aria-label="Breadcrumb"
+        >
+
+          {
+            autoBreadcrumbs.map(
+              (item, index) => (
+
+                <Fragment>
+
+                  {
+                    index > 0 && (
+                      <span class="separator">
+                        /
+                      </span>
+                    )
+                  }
+
+
+                  {
+                    index ===
+                    autoBreadcrumbs.length - 1
+                      ? (
+
+                          <span>
+                            {item.name}
+                          </span>
+
+                        )
+                      : (
+
+                          <a href={item.url}>
+                            {item.name}
+                          </a>
+
+                        )
+                  }
+
+                </Fragment>
+
+              )
+            )
+          }
+
+        </nav>
+
+      )
+    }
+
+
+    <slot />
+
+  </main>
+
+
+  <Footer />
+
+
+  <!-- =================================
+       GLOBAL UI SCRIPT
+  ================================== -->
+
+  <script is:inline>
+
+    const html =
+      document.documentElement;
+
+
+    /* ================================
+       THEME
+    ================================= */
+
+    const themeToggle =
+      document.getElementById(
+        "themeToggle"
+      );
+
+    const mediaQuery =
+      window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      );
+
+
+    if (themeToggle) {
+
+      themeToggle.onclick = () => {
+
+        const nextTheme =
+          html.dataset.theme === "dark"
+            ? "light"
+            : "dark";
+
+        html.dataset.theme =
+          nextTheme;
+
+        localStorage.setItem(
+          "theme",
+          nextTheme
+        );
+
+      };
+
+    }
+
+
+    mediaQuery.addEventListener(
+      "change",
+      (event) => {
+
+        const savedTheme =
+          localStorage.getItem("theme");
+
+        if (!savedTheme) {
+
+          html.dataset.theme =
+            event.matches
+              ? "dark"
+              : "light";
+
+        }
+
+      }
+    );
+
+
+    /* ================================
+       MOBILE MENU
+    ================================= */
+
+    const menu =
+      document.getElementById(
+        "menuToggle"
+      );
+
+    const nav =
+      document.getElementById(
+        "nav"
+      );
+
+
+    if (menu && nav) {
+
+      menu.onclick = () => {
+
+        nav.classList.toggle(
+          "active"
+        );
+
+        menu.textContent =
+          nav.classList.contains("active")
+            ? "✕"
+            : "☰";
+
+      };
+
+
+      document
+        .querySelectorAll(".nav a")
+        .forEach((link) => {
+
+          link.onclick = () => {
+
+            nav.classList.remove(
+              "active"
+            );
+
+            menu.textContent =
+              "☰";
+
+          };
+
+        });
+
+    }
+
+
+    /* ================================
+       MOBILE DROPDOWN
+    ================================= */
+
+    document
+      .querySelectorAll(".drop-btn")
+      .forEach((btn) => {
+
+        btn.onclick = (event) => {
+
+          if (
+            window.innerWidth > 768
+          ) {
+            return;
+          }
+
+          event.preventDefault();
+
+          btn.parentElement
+            ?.classList
+            .toggle("open");
+
+        };
+
+      });
+
+  </script>
+
+</body>
+
+</html>

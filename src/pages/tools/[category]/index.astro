@@ -1,0 +1,700 @@
+---
+import MainLayout from "../../../layouts/MainLayout.astro";
+
+/* =========================================================
+   CATEGORY
+   ========================================================= */
+
+export async function getStaticPaths() {
+  const modules = import.meta.glob(
+    "../**/*.astro",
+    { eager: true }
+  );
+
+  const categories = new Set();
+
+  for (const file of Object.keys(modules)) {
+    const match = file.match(
+      /^\.\.\/([^/]+)\/(.+)\.astro$/
+    );
+
+    if (!match) continue;
+
+    const category = match[1];
+
+    if (category === "[category]") continue;
+
+    categories.add(category);
+  }
+
+  return [...categories].map((category) => ({
+    params: { category }
+  }));
+}
+
+const category = Astro.params.category || "";
+
+const categoryName = category
+  .replace(/[-_]/g, " ")
+  .replace(/\b\w/g, (char) => char.toUpperCase());
+
+
+/* =========================================================
+   TOOLS
+   ========================================================= */
+
+const modules = Object.entries(
+  import.meta.glob(
+    "../**/*.astro",
+    { eager: true }
+  )
+);
+
+const tools = modules
+  .map(([file, mod]) => {
+    const match = file.match(
+      /^\.\.\/([^/]+)\/(.+)\.astro$/
+    );
+
+    if (!match) return null;
+
+    const fileCategory = match[1];
+    const toolPath = match[2];
+
+    if (
+      fileCategory.toLowerCase() !==
+      category.toLowerCase()
+    ) {
+      return null;
+    }
+
+    if (toolPath === "index") return null;
+
+    if (!mod.meta) return null;
+
+    return {
+      ...mod.meta,
+      url: `/tools/${category}/${toolPath}/`
+    };
+  })
+  .filter(Boolean)
+  .sort((a, b) =>
+    (a.title || "").localeCompare(
+      b.title || ""
+    )
+  );
+
+
+/* =========================================================
+   FEATURED
+   ========================================================= */
+
+const featured = tools.filter(
+  (tool) => tool.featured
+);
+
+const total = tools.length;
+
+
+/* =========================================================
+   SEO
+   ========================================================= */
+
+const siteUrl = "https://aimrferdy.com";
+
+const pageUrl =
+  `${siteUrl}/tools/${category}/`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+
+  name:
+    `${categoryName} Tools Online Gratis`,
+
+  url: pageUrl,
+
+  numberOfItems: total,
+
+  itemListElement: tools.map(
+    (tool, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: tool.title,
+      url:
+        `${siteUrl}${tool.url}`
+    })
+  )
+};
+---
+
+<MainLayout
+  title={`${categoryName} Tools Online Gratis | AI Mr Ferdy`}
+  description={`Kumpulan ${categoryName.toLowerCase()} tools online gratis yang dapat digunakan langsung dari browser.`}
+  pageCSS={["tools"]}
+>
+
+  <main class="tools-page">
+
+    <!-- HERO -->
+    <header class="tools-header">
+
+      <span class="tools-label">
+        {categoryName.toUpperCase()} TOOLS
+      </span>
+
+      <h1>
+        {categoryName} Tools Online Gratis
+      </h1>
+
+      <p>
+        Kumpulan {categoryName.toLowerCase()}
+        tools online gratis yang dapat digunakan
+        langsung dari browser.
+      </p>
+
+    </header>
+
+
+    <!-- STATS -->
+    <section class="tools-stats">
+
+      <div>
+        <strong>{total}</strong>
+        <span>Tools</span>
+      </div>
+
+      <div>
+        <strong>100%</strong>
+        <span>Gratis</span>
+      </div>
+
+      <div>
+        <strong>Fast</strong>
+        <span>No Login</span>
+      </div>
+
+    </section>
+
+
+    <!-- SEARCH -->
+    <div class="tools-search">
+
+      <input
+        id="toolSearch"
+        type="search"
+        placeholder={`Cari ${categoryName.toLowerCase()} tools...`}
+        autocomplete="off"
+      />
+
+    </div>
+
+
+    <!-- FEATURED -->
+    {featured.length > 0 && (
+
+      <section class="tools-section">
+
+        <h2 class="section-title">
+          🔥 Popular {categoryName} Tools
+        </h2>
+
+        <div class="tools-grid">
+
+          {featured.map((tool) => (
+
+            <a
+              href={tool.url}
+              class="tool-card popular"
+              data-search={`${tool.title} ${tool.description || ""}`}
+            >
+
+              <span class="tool-badge">
+                HOT
+              </span>
+
+              {tool.icon && (
+                <div class="tool-icon">
+                  {tool.icon}
+                </div>
+              )}
+
+              <h3>
+                {tool.title}
+              </h3>
+
+              <p>
+                {tool.description}
+              </p>
+
+              <span class="tool-action">
+                Gunakan Tool →
+              </span>
+
+            </a>
+
+          ))}
+
+        </div>
+
+      </section>
+
+    )}
+
+
+    <!-- ALL TOOLS -->
+    <section class="tools-section">
+
+      <h2 class="section-title">
+        📂 Semua {categoryName} Tools
+      </h2>
+
+      <div
+        id="toolsGrid"
+        class="tools-grid"
+      >
+
+        {tools.map((tool) => (
+
+          <a
+            href={tool.url}
+            class="tool-card"
+            data-search={`${tool.title} ${tool.description || ""}`}
+          >
+
+            {tool.icon && (
+              <div class="tool-icon">
+                {tool.icon}
+              </div>
+            )}
+
+            <h3>
+              {tool.title}
+            </h3>
+
+            <p>
+              {tool.description}
+            </p>
+
+            <span class="tool-action">
+              Gunakan Tool →
+            </span>
+
+          </a>
+
+        ))}
+
+      </div>
+
+    </section>
+
+
+    <!-- EMPTY -->
+    <div
+      id="emptyState"
+      class="tools-empty"
+      hidden
+    >
+      <strong>
+        Tool tidak ditemukan
+      </strong>
+
+      <p>
+        Coba gunakan kata kunci pencarian lainnya.
+      </p>
+    </div>
+
+  </main>
+
+
+  <!-- SEARCH -->
+  <script>
+    const searchInput =
+      document.querySelector("#toolSearch");
+
+    const cards =
+      document.querySelectorAll(
+        ".tool-card"
+      );
+
+    const emptyState =
+      document.querySelector(
+        "#emptyState"
+      );
+
+    searchInput?.addEventListener(
+      "input",
+      () => {
+
+        const query =
+          searchInput.value
+            .toLowerCase()
+            .trim();
+
+        let visible = 0;
+
+        cards.forEach((card) => {
+
+          const text =
+            card.dataset.search ||
+            card.textContent ||
+            "";
+
+          const match =
+            text
+              .toLowerCase()
+              .includes(query);
+
+          card.hidden = !match;
+
+          if (match) {
+            visible++;
+          }
+
+        });
+
+        if (emptyState) {
+          emptyState.hidden =
+            visible !== 0;
+        }
+
+      }
+    );
+  </script>
+
+
+  <!-- SEO JSON-LD -->
+  <script type="application/ld+json">
+    {JSON.stringify(jsonLd)}
+  </script>
+
+</MainLayout>
+
+
+<style>
+
+  /* =======================================================
+     PAGE
+     ======================================================= */
+
+  .tools-page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 110px 24px 50px;
+  }
+
+
+  /* =======================================================
+     HEADER
+     ======================================================= */
+
+  .tools-header {
+    max-width: 780px;
+    margin: 0 auto 36px;
+    text-align: center;
+  }
+
+  .tools-label {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: var(--primary, #3b82f6);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+  }
+
+  .tools-header h1 {
+    margin: 0 0 14px;
+    color: var(--text, #f8fafc);
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.1;
+  }
+
+  .tools-header p {
+    max-width: 650px;
+    margin: 0 auto;
+    color: var(--soft, #94a3b8);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+
+  /* =======================================================
+     STATS
+     ======================================================= */
+
+  .tools-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 700px;
+    margin: 0 auto 32px;
+    overflow: hidden;
+    border: 1px solid var(
+      --border,
+      rgba(255, 255, 255, .08)
+    );
+    border-radius: 16px;
+    background: var(
+      --card,
+      rgba(15, 23, 42, .72)
+    );
+  }
+
+  .tools-stats div {
+    padding: 18px 12px;
+    text-align: center;
+  }
+
+  .tools-stats strong {
+    display: block;
+    color: var(--text, #f8fafc);
+    font-size: 22px;
+    line-height: 1.2;
+  }
+
+  .tools-stats span {
+    display: block;
+    margin-top: 5px;
+    color: var(--soft, #94a3b8);
+    font-size: 13px;
+  }
+
+
+  /* =======================================================
+     SEARCH
+     ======================================================= */
+
+  .tools-search {
+    max-width: 650px;
+    margin: 0 auto 40px;
+  }
+
+  .tools-search input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 18px;
+    border: 1px solid var(
+      --border,
+      rgba(255, 255, 255, .08)
+    );
+    border-radius: 12px;
+    outline: none;
+    background: var(
+      --card,
+      rgba(15, 23, 42, .72)
+    );
+    color: var(--text, #f8fafc);
+    font: inherit;
+  }
+
+  .tools-search input::placeholder {
+    color: var(--soft, #94a3b8);
+  }
+
+  .tools-search input:focus {
+    border-color:
+      var(--primary, #3b82f6);
+  }
+
+
+  /* =======================================================
+     SECTION
+     ======================================================= */
+
+  .tools-section {
+    margin-bottom: 44px;
+  }
+
+  .section-title {
+    margin: 0 0 20px;
+    color: var(--text, #f8fafc);
+    font-size: 24px;
+    line-height: 1.3;
+  }
+
+
+  /* =======================================================
+     GRID
+     ======================================================= */
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+
+  /* =======================================================
+     CARD
+     ======================================================= */
+
+  .tool-card {
+    position: relative;
+    display: block;
+    min-width: 0;
+    padding: 22px;
+    color: inherit;
+    text-decoration: none;
+    border: 1px solid var(
+      --border,
+      rgba(255, 255, 255, .08)
+    );
+    border-radius: 18px;
+    background: var(
+      --card,
+      rgba(15, 23, 42, .72)
+    );
+    transition:
+      transform .2s ease,
+      border-color .2s ease,
+      box-shadow .2s ease;
+  }
+
+  .tool-card:hover {
+    transform: translateY(-4px);
+    border-color:
+      rgba(59, 130, 246, .4);
+    box-shadow:
+      0 12px 35px
+      rgba(0, 0, 0, .18);
+  }
+
+  .tool-card.popular {
+    border-color:
+      rgba(59, 130, 246, .25);
+  }
+
+
+  /* =======================================================
+     ICON
+     ======================================================= */
+
+  .tool-icon {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 14px;
+    border-radius: 13px;
+    background:
+      rgba(59, 130, 246, .12);
+    font-size: 24px;
+  }
+
+
+  /* =======================================================
+     TEXT
+     ======================================================= */
+
+  .tool-card h3 {
+    margin: 0 0 8px;
+    color: var(--text, #f8fafc);
+    font-size: 18px;
+    line-height: 1.35;
+  }
+
+  .tool-card p {
+    margin: 0;
+    color: var(--soft, #94a3b8);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .tool-action {
+    display: inline-block;
+    margin-top: 15px;
+    color: var(--primary, #3b82f6);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+
+  /* =======================================================
+     BADGE
+     ======================================================= */
+
+  .tool-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: var(--primary, #3b82f6);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+
+  /* =======================================================
+     EMPTY
+     ======================================================= */
+
+  .tools-empty {
+    padding: 35px 20px;
+    margin-bottom: 40px;
+    text-align: center;
+    border: 1px dashed var(
+      --border,
+      rgba(255, 255, 255, .08)
+    );
+    border-radius: 16px;
+    color: var(--soft, #94a3b8);
+  }
+
+  .tools-empty[hidden] {
+    display: none;
+  }
+
+  .tools-empty strong {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text, #f8fafc);
+  }
+
+  .tools-empty p {
+    margin: 0;
+  }
+
+
+  /* =======================================================
+     RESPONSIVE
+     ======================================================= */
+
+  @media (max-width: 900px) {
+
+    .tools-grid {
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    }
+
+  }
+
+
+  @media (max-width: 600px) {
+
+    .tools-page {
+      padding: 96px 16px 35px;
+    }
+
+    .tools-grid {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .tools-stats div {
+      padding: 14px 8px;
+    }
+
+    .tools-stats strong {
+      font-size: 18px;
+    }
+
+    .section-title {
+      font-size: 21px;
+    }
+
+  }
+
+</style>

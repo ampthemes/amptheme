@@ -1,0 +1,515 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import { SITE } from "../lib/site";
+import "../styles/pages.css";
+
+const pageTitle = `Pricing - ${SITE.name || "Ai Mr Ferdy"}`;
+
+const pageDescription =
+  "Informasi paket dan pilihan layanan digital Ai Mr Ferdy untuk kebutuhan website, SEO, AI, tools, dan teknologi modern.";
+---
+
+<MainLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonical={`${SITE.url()}/pricing`}
+>
+
+  <main class="page page-pricing">
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="page-hero">
+
+      <div class="page-container">
+
+        <span class="page-label">
+          PRICING
+        </span>
+
+        <h1>
+          Pilih Solusi Digital
+          Sesuai Kebutuhan Anda
+        </h1>
+
+        <p>
+          Pilih pendekatan yang sesuai dengan kebutuhan
+          website, SEO, AI, tools, dan pengembangan
+          digital Anda.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PLANS
+    ====================================================== -->
+
+    <section class="page-section">
+
+      <div class="page-container">
+
+        <div class="page-section-heading">
+
+          <span class="page-label">
+            PLANS
+          </span>
+
+          <h2>
+            Pilihan Layanan
+          </h2>
+
+          <p>
+            Setiap kebutuhan dapat memiliki pendekatan
+            yang berbeda. Mulai dari kebutuhan sederhana
+            hingga pengembangan yang lebih kompleks.
+          </p>
+
+        </div>
+
+
+        <div class="page-grid">
+
+          <article class="page-card">
+
+            <span class="page-label">
+              STARTER
+            </span>
+
+            <h3>
+              Basic
+            </h3>
+
+            <p>
+              Cocok untuk kebutuhan awal seperti
+              konsultasi, evaluasi website, atau
+              perencanaan digital.
+            </p>
+
+            <div class="page-divider"></div>
+
+            <ul>
+              <li>Initial consultation</li>
+              <li>Basic website review</li>
+              <li>SEO direction</li>
+              <li>Action recommendations</li>
+            </ul>
+
+            <a
+              href="/contact/"
+              class="page-button page-button-secondary"
+            >
+              Konsultasi
+            </a>
+
+          </article>
+
+
+          <article class="page-card page-card-featured">
+
+            <span class="page-label">
+              POPULAR
+            </span>
+
+            <h3>
+              Growth
+            </h3>
+
+            <p>
+              Untuk kebutuhan optimasi dan pengembangan
+              digital yang membutuhkan strategi lebih
+              menyeluruh.
+            </p>
+
+            <div class="page-divider"></div>
+
+            <ul>
+              <li>SEO strategy</li>
+              <li>Technical optimization</li>
+              <li>Content direction</li>
+              <li>Performance recommendations</li>
+            </ul>
+
+            <a
+              href="/contact/"
+              class="page-button page-button-primary"
+            >
+              Mulai Diskusi
+            </a>
+
+          </article>
+
+
+          <article class="page-card">
+
+            <span class="page-label">
+              ADVANCED
+            </span>
+
+            <h3>
+              Custom
+            </h3>
+
+            <p>
+              Solusi yang disesuaikan dengan kebutuhan
+              proyek, sistem, website, AI, atau
+              automation tertentu.
+            </p>
+
+            <div class="page-divider"></div>
+
+            <ul>
+              <li>Custom requirements</li>
+              <li>Advanced planning</li>
+              <li>AI & automation direction</li>
+              <li>Project-specific strategy</li>
+            </ul>
+
+            <a
+              href="/contact/"
+              class="page-button page-button-secondary"
+            >
+              Hubungi Kami
+            </a>
+
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         INFORMATION
+    ====================================================== -->
+
+    <section class="page-section">
+
+      <div class="page-container">
+
+        <div class="page-section-heading">
+
+          <span class="page-label">
+            INFORMATION
+          </span>
+
+          <h2>
+            Tidak Ada Paket yang Cocok?
+          </h2>
+
+          <p>
+            Tidak semua proyek memiliki kebutuhan yang
+            sama. Jika kebutuhan Anda berbeda dari pilihan
+            di atas, solusi dapat dibicarakan secara
+            langsung.
+          </p>
+
+        </div>
+
+
+        <div class="page-legal">
+
+          <div class="page-legal-section">
+
+            <h3>
+              Custom Project
+            </h3>
+
+            <p>
+              Untuk proyek dengan kebutuhan khusus,
+              ruang lingkup pekerjaan dapat disesuaikan
+              berdasarkan tujuan, teknologi, dan tingkat
+              kompleksitas proyek.
+            </p>
+
+          </div>
+
+
+          <div class="page-legal-section">
+
+            <h3>
+              Harga dan Scope
+            </h3>
+
+            <p>
+              Biaya layanan dapat berbeda berdasarkan
+              ruang lingkup, fitur, tingkat pengerjaan,
+              serta kebutuhan teknis masing-masing proyek.
+            </p>
+
+          </div>
+
+
+          <div class="page-legal-section">
+
+            <h3>
+              Konsultasi
+            </h3>
+
+            <p>
+              Hubungi Ai Mr Ferdy terlebih dahulu untuk
+              menjelaskan kebutuhan sebelum menentukan
+              layanan yang paling sesuai.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CTA
+    ====================================================== -->
+
+    <section class="page-cta">
+
+      <div class="page-container">
+
+        <span class="page-label">
+          GET STARTED
+        </span>
+
+        <h2>
+          Punya Kebutuhan Digital Khusus?
+        </h2>
+
+        <p>
+          Mari diskusikan kebutuhan Anda dan tentukan
+          pendekatan yang paling sesuai.
+        </p>
+
+        <a
+          href="/contact/"
+          class="page-button page-button-primary"
+        >
+          Hubungi Ai Mr Ferdy
+        </a>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+<style is:global>
+
+/* ==========================================================
+   PRICING PAGE
+   Class khusus halaman pricing
+========================================================== */
+
+.page-pricing {
+  width: 100%;
+}
+
+
+/* ==========================================================
+   SECTION HEADING
+========================================================== */
+
+.page-pricing .page-section-heading {
+  max-width: 760px;
+  margin: 0 auto 45px;
+  text-align: center;
+}
+
+.page-pricing .page-section-heading .page-label {
+  margin-bottom: 14px;
+}
+
+.page-pricing .page-section-heading h2 {
+  margin: 0 0 14px;
+  font-size: clamp(28px, 5vw, 42px);
+  line-height: 1.2;
+}
+
+.page-pricing .page-section-heading p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+
+/* ==========================================================
+   PRICING GRID
+========================================================== */
+
+.page-pricing .page-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+
+
+/* ==========================================================
+   PRICING CARD
+========================================================== */
+
+.page-pricing .page-card {
+  display: flex;
+  flex-direction: column;
+
+  padding: 30px;
+
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease;
+}
+
+.page-pricing .page-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(59,130,246,.35);
+  box-shadow: 0 16px 40px rgba(0,0,0,.15);
+}
+
+
+/* ==========================================================
+   FEATURED CARD
+========================================================== */
+
+.page-pricing .page-card-featured {
+  border-color: rgba(59,130,246,.45);
+  box-shadow: 0 12px 35px rgba(0,0,0,.12);
+}
+
+
+/* ==========================================================
+   CARD LABEL
+========================================================== */
+
+.page-pricing .page-card > .page-label {
+  align-self: flex-start;
+  margin-bottom: 18px;
+}
+
+
+/* ==========================================================
+   CARD TITLE
+========================================================== */
+
+.page-pricing .page-card h3 {
+  margin: 0 0 12px;
+
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+
+/* ==========================================================
+   CARD DESCRIPTION
+========================================================== */
+
+.page-pricing .page-card > p {
+  margin: 0;
+
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+
+/* ==========================================================
+   CARD LIST
+========================================================== */
+
+.page-pricing .page-card ul {
+  margin: 0 0 28px;
+  padding-left: 20px;
+
+  color: var(--muted);
+  line-height: 1.9;
+}
+
+.page-pricing .page-card li {
+  padding-left: 4px;
+}
+
+
+/* ==========================================================
+   CARD BUTTON
+========================================================== */
+
+.page-pricing .page-card .page-button {
+  margin-top: auto;
+}
+
+
+/* ==========================================================
+   BUTTON VARIANTS
+========================================================== */
+
+.page-pricing .page-button-primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.page-pricing .page-button-primary:hover {
+  background: var(--primary-hover);
+}
+
+.page-pricing .page-button-secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.page-pricing .page-button-secondary:hover {
+  background: rgba(255,255,255,.05);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+
+/* ==========================================================
+   LEGAL INFORMATION
+========================================================== */
+
+.page-pricing .page-legal {
+  max-width: 900px;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 900px) {
+
+  .page-pricing .page-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 640px) {
+
+  .page-pricing .page-card {
+    padding: 24px;
+  }
+
+  .page-pricing .page-section-heading {
+    margin-bottom: 32px;
+  }
+
+}
+
+</style>
+</MainLayout>

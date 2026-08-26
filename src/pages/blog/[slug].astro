@@ -1,0 +1,170 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { SITE } from '../../lib/site';
+import "../../styles/blog.css";
+import TOC from "../../components/TOC.astro";
+import RelatedPosts from "../../components/RelatedPosts.astro";
+
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+
+  return posts.map((post) => ({
+    params: {
+      slug: post.slug
+    },
+    props: {
+      post
+    }
+  }));
+}
+
+const { post } = Astro.props;
+
+const { Content, headings } = await render(post);
+
+const posts = await getCollection("blog");
+
+const displayImage =
+  post.data.image?.trim()
+  || `/api/og/${post.slug}.svg`;
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+
+  headline: post.data.title,
+
+  description: post.data.description,
+
+  image: displayImage,
+
+  url: SITE.url(`/blog/${post.slug}/`),
+
+  author: {
+    "@type": "Organization",
+    name: SITE.name
+  },
+
+  publisher: {
+    "@type": "Organization",
+    name: SITE.name
+  }
+};
+---
+
+<MainLayout
+  title={`${post.data.title} | ${SITE.title}`}
+  description={post.data.description}
+  articleSchema={articleSchema}
+  amp={SITE.url(`/blog/${post.slug}/amp/`)}
+  slug={post.slug}
+>
+
+  <main class="article">
+
+    <div class="container">
+
+      <div class="article-wrap">
+
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb">
+
+          <a href="/">Home</a>
+
+          <span>/</span>
+
+          <a href="/blog/">Blog</a>
+
+          <span>/</span>
+
+          <span>{post.data.title}</span>
+
+        </nav>
+
+        <!-- Header -->
+        <header class="article-header">
+
+          <h1>
+            {post.data.title}
+          </h1>
+
+          {post.data.description && (
+            <p class="article-excerpt">
+              {post.data.description}
+            </p>
+          )}
+
+        </header>
+
+        <!-- Sticky CTA -->
+        <div class="sticky-cta">
+
+          <div class="sticky-content">
+
+            <div class="sticky-text">
+
+              <strong>
+                {post.data.title}
+              </strong>
+
+              {post.data.description && (
+                <p>
+                  {post.data.description}
+                </p>
+              )}
+
+            </div>
+
+            <a
+              href="/tools/"
+              class="cta-btn"
+            >
+              Coba Sekarang
+            </a>
+
+          </div>
+
+        </div>
+
+        <!-- Featured -->
+        <div class="article-cover">
+
+          <img
+            src={displayImage}
+            alt={post.data.title}
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
+            width="1200"
+            height="630"
+          />
+
+        </div>
+
+        <!-- TOC -->
+        <TOC headings={headings} />
+
+        <!-- Content -->
+        <article class="article-content">
+
+          <Content />
+
+        </article>
+
+        <!-- Related -->
+        <RelatedPosts
+          posts={posts}
+          currentSlug={post.slug}
+          title="Artikel Terkait"
+          baseUrl="/blog"
+        />
+
+      </div>
+
+    </div>
+
+  </main>
+
+</MainLayout>

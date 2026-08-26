@@ -1,0 +1,501 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import "../styles/pages.css";
+import "../styles/contact.css";
+
+const pageTitle = "Contact - Ai Mr Ferdy";
+
+const pageDescription =
+  "Hubungi Ai Mr Ferdy untuk konsultasi digital growth, SEO strategy, website optimization, dan kebutuhan teknologi digital.";
+---
+
+<MainLayout
+  title={pageTitle}
+  description={pageDescription}
+>
+
+  <main class="page page-contact">
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="page-hero contact-hero">
+
+      <div class="contact-hero-grid">
+
+        <div class="contact-content">
+
+          <span class="page-label">
+            CONTACT AI MR FERDY
+          </span>
+
+          <h1>
+            Mari Diskusikan Kebutuhan Digital Anda
+          </h1>
+
+          <p class="page-hero-description">
+            Punya pertanyaan tentang SEO, website,
+            content strategy, atau pengembangan digital?
+            Sampaikan kebutuhan Anda dan mari cari solusi
+            yang sesuai.
+          </p>
+
+          <div class="contact-list">
+
+            <div class="contact-item">
+              <strong>Email</strong>
+              <p>hello@aimrferdy.com</p>
+            </div>
+
+            <div class="contact-item">
+              <strong>WhatsApp</strong>
+              <p>+62 812-3456-7890</p>
+            </div>
+
+            <div class="contact-item">
+              <strong>Location</strong>
+              <p>Indonesia</p>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             FORM WHATSAPP
+        ================================================== -->
+
+        <div class="contact-form-card">
+
+          <span class="page-label">
+            KONSULTASI
+          </span>
+
+          <h2>
+            Mulai Percakapan
+          </h2>
+
+          <p>
+            Ceritakan kebutuhan atau tujuan digital
+            yang ingin Anda capai.
+          </p>
+
+          <form
+            id="contactForm"
+            class="contact-form"
+          >
+
+            <div class="contact-form-group">
+
+              <label for="name">
+                Nama
+              </label>
+
+              <input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Nama lengkap"
+                autocomplete="name"
+                required
+              />
+
+            </div>
+
+
+            <div class="contact-form-group">
+
+              <label for="email">
+                Email
+              </label>
+
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="email@domain.com"
+                autocomplete="email"
+                required
+              />
+
+            </div>
+
+
+            <div class="contact-form-group">
+
+              <label for="website">
+                Website
+              </label>
+
+              <input
+                id="website"
+                name="website"
+                type="url"
+                placeholder="https://websiteanda.com"
+              />
+
+            </div>
+
+
+            <div class="contact-form-group">
+
+              <label for="message">
+                Kebutuhan
+              </label>
+
+              <textarea
+                id="message"
+                name="message"
+                rows="5"
+                placeholder="Ceritakan kebutuhan Anda..."
+                required
+              ></textarea>
+
+            </div>
+
+
+            <button
+              type="submit"
+              class="page-button page-button-primary contact-submit"
+            >
+              Kirim via WhatsApp
+            </button>
+
+          </form>
+
+          <p class="contact-form-note">
+            Setelah dikirim, Anda akan diarahkan ke WhatsApp
+            dengan pesan konsultasi yang sudah disiapkan.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SERVICES
+    ====================================================== -->
+
+    <section class="page-section">
+
+      <div class="page-container">
+
+        <div class="page-section-heading">
+
+          <span class="page-label">
+            SERVICES
+          </span>
+
+          <h2>
+            Layanan Digital
+          </h2>
+
+          <p>
+            Beberapa area yang dapat dibantu untuk
+            membangun dan mengembangkan aset digital.
+          </p>
+
+        </div>
+
+
+        <div class="contact-service-grid">
+
+          <article class="contact-service-card">
+            <h3>SEO Strategy</h3>
+
+            <p>
+              Perencanaan SEO, riset keyword,
+              struktur konten, dan roadmap pertumbuhan
+              berdasarkan kebutuhan website.
+            </p>
+          </article>
+
+
+          <article class="contact-service-card">
+            <h3>Technical Optimization</h3>
+
+            <p>
+              Optimasi struktur website, technical SEO,
+              performa, indexing, dan pengalaman pengguna.
+            </p>
+          </article>
+
+
+          <article class="contact-service-card">
+            <h3>Content Strategy</h3>
+
+            <p>
+              Pengembangan strategi konten dan topical
+              authority untuk membangun visibilitas
+              secara berkelanjutan.
+            </p>
+          </article>
+
+
+          <article class="contact-service-card">
+            <h3>Website Optimization</h3>
+
+            <p>
+              Penyempurnaan tampilan, struktur,
+              usability, dan performa website modern.
+            </p>
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PROCESS
+    ====================================================== -->
+
+    <section class="page-section page-section-alt">
+
+      <div class="page-container">
+
+        <div class="page-section-heading">
+
+          <span class="page-label">
+            PROCESS
+          </span>
+
+          <h2>
+            Bagaimana Prosesnya?
+          </h2>
+
+          <p>
+            Proses dibuat sederhana agar kebutuhan
+            dapat dipahami sebelum menentukan langkah
+            berikutnya.
+          </p>
+
+        </div>
+
+
+        <div class="contact-process-grid">
+
+          <article class="contact-process-card">
+            <span class="contact-process-number">01</span>
+
+            <h3>Diskusi Awal</h3>
+
+            <p>
+              Memahami kebutuhan, kondisi website,
+              target, dan tujuan yang ingin dicapai.
+            </p>
+          </article>
+
+
+          <article class="contact-process-card">
+            <span class="contact-process-number">02</span>
+
+            <h3>Analisis</h3>
+
+            <p>
+              Meninjau masalah dan peluang yang
+              berkaitan dengan website atau strategi
+              digital.
+            </p>
+          </article>
+
+
+          <article class="contact-process-card">
+            <span class="contact-process-number">03</span>
+
+            <h3>Rekomendasi</h3>
+
+            <p>
+              Menentukan pendekatan dan prioritas
+              berdasarkan kebutuhan yang ditemukan.
+            </p>
+          </article>
+
+
+          <article class="contact-process-card">
+            <span class="contact-process-number">04</span>
+
+            <h3>Implementasi</h3>
+
+            <p>
+              Melanjutkan ke tahap pengerjaan dan
+              evaluasi sesuai kesepakatan.
+            </p>
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         FAQ
+    ====================================================== -->
+
+    <section class="page-section">
+
+      <div class="page-container">
+
+        <div class="page-section-heading">
+
+          <span class="page-label">
+            FAQ
+          </span>
+
+          <h2>
+            Pertanyaan Umum
+          </h2>
+
+        </div>
+
+
+        <div class="contact-faq">
+
+          <article class="contact-faq-item">
+            <h3>Apakah konsultasi awal gratis?</h3>
+
+            <p>
+              Konsultasi awal dapat digunakan untuk
+              menjelaskan kebutuhan dan menentukan
+              apakah solusi yang tersedia sesuai.
+            </p>
+          </article>
+
+
+          <article class="contact-faq-item">
+            <h3>Apa saja yang bisa dikonsultasikan?</h3>
+
+            <p>
+              Topiknya dapat mencakup SEO, website,
+              content strategy, automation, tools,
+              dan pengembangan digital.
+            </p>
+          </article>
+
+
+          <article class="contact-faq-item">
+            <h3>Apakah bisa untuk website baru?</h3>
+
+            <p>
+              Bisa. Diskusi dapat dimulai dari tahap
+              perencanaan maupun dari website yang
+              sudah berjalan.
+            </p>
+          </article>
+
+
+          <article class="contact-faq-item">
+            <h3>Bagaimana cara menghubungi?</h3>
+
+            <p>
+              Gunakan informasi kontak yang tersedia
+              atau kirimkan kebutuhan melalui formulir
+              konsultasi di halaman ini.
+            </p>
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CTA
+    ====================================================== -->
+
+    <section class="page-cta">
+
+      <div class="page-container">
+
+        <span class="page-label">
+          LET'S CONNECT
+        </span>
+
+        <h2>
+          Punya Ide atau Kebutuhan Digital?
+        </h2>
+
+        <p>
+          Mari mulai dengan membicarakan kebutuhan
+          dan tujuan yang ingin Anda capai.
+        </p>
+
+        <a
+          href="https://wa.me/6281234567890"
+          class="page-button page-button-primary"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Chat via WhatsApp
+        </a>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =====================================================
+       WHATSAPP FORM SCRIPT
+  ====================================================== -->
+
+  <script is:inline>
+    const contactForm = document.getElementById("contactForm");
+
+    contactForm?.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const name =
+        document.getElementById("name")?.value.trim() || "";
+
+      const email =
+        document.getElementById("email")?.value.trim() || "";
+
+      const website =
+        document.getElementById("website")?.value.trim() || "";
+
+      const message =
+        document.getElementById("message")?.value.trim() || "";
+
+      if (!name || !email || !message) {
+        alert("Silakan lengkapi nama, email, dan kebutuhan Anda.");
+        return;
+      }
+
+      const whatsappNumber = "6281234567890";
+
+      const whatsappMessage = [
+        "Halo Ai Mr Ferdy, saya ingin berkonsultasi.",
+        "",
+        `Nama: ${name}`,
+        `Email: ${email}`,
+        `Website: ${website || "-"}`,
+        "",
+        "Kebutuhan:",
+        message
+      ].join("\n");
+
+      const whatsappURL =
+        `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+
+      window.open(
+        whatsappURL,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    });
+  </script>
+
+</MainLayout>

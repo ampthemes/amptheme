@@ -1,0 +1,544 @@
+
+---
+import MainLayout from "../../../layouts/MainLayout.astro";
+
+// Ambil semua halaman tool dalam folder web
+const modules = Object.entries(
+  import.meta.glob("./**/*.astro", { eager: true })
+);
+
+// Filter dan ambil metadata
+const tools = modules
+  .map(([file, mod]) => {
+    // Jangan proses index.astro
+    if (file.endsWith("/index.astro")) return null;
+
+    // Hanya file yang punya meta
+    if (!mod.meta) return null;
+
+    const url = file
+      .replace("./", "/tools/web/")
+      .replace(".astro", "/");
+
+    return {
+      url,
+      ...mod.meta,
+    };
+  })
+  .filter(Boolean)
+  .sort((a, b) =>
+    (a.title || "").localeCompare(b.title || "")
+  );
+
+// Featured
+const featured = tools.filter(tool => tool.featured);
+
+// Total
+const total = tools.length;
+
+// SEO JSON-LD
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Web Tools Online Gratis",
+  description:
+    "Kumpulan web tools online gratis untuk HTML, CSS, JavaScript, JSON, dan kebutuhan web development.",
+  numberOfItems: total,
+  itemListElement: tools.map((tool, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: tool.title,
+    url: `https://aimrferdy.net${tool.url}`,
+  })),
+};
+---
+
+<MainLayout
+  title="Web Tools Online Gratis Lengkap | AI Mr Ferdy"
+  description="Kumpulan web tools online gratis untuk HTML, CSS, JavaScript, JSON, dan kebutuhan web development."
+  pageCSS={["tools"]}
+>
+  <div class="tools-container">
+
+    <!-- HERO -->
+    <section class="tools-hero">
+      <span class="tools-eyebrow">WEB TOOLS</span>
+
+      <h1>Web Tools Online Gratis</h1>
+
+      <p>
+        Kumpulan tools web untuk membuat, mengedit, memformat,
+        dan mengoptimasi kode langsung di browser.
+      </p>
+    </section>
+
+    <!-- STATS -->
+    <section class="tools-stats">
+      <div>
+        <strong>{total}</strong>
+        <span>Tools</span>
+      </div>
+
+      <div>
+        <strong>100%</strong>
+        <span>Gratis</span>
+      </div>
+
+      <div>
+        <strong>Fast</strong>
+        <span>No Login</span>
+      </div>
+    </section>
+
+    <!-- SEARCH -->
+    <section class="tools-search">
+      <input
+        id="searchTools"
+        type="search"
+        placeholder="Cari web tools..."
+        autocomplete="off"
+      />
+    </section>
+
+    <!-- FEATURED -->
+    {featured.length > 0 && (
+      <section class="tools-section featured-section">
+        <h2 class="section-title">
+          🔥 Popular Web Tools
+        </h2>
+
+        <div class="tools-grid" id="featuredTools">
+          {featured.map(tool => (
+            <a
+              href={tool.url}
+              class="tool-card popular"
+              data-search={`${tool.title} ${tool.description}`}
+            >
+              <div class="badge">HOT</div>
+
+              {tool.icon && (
+                <div class="tool-icon">
+                  {tool.icon}
+                </div>
+              )}
+
+              <h3>{tool.title}</h3>
+
+              <p>{tool.description}</p>
+
+              <span class="tool-link">
+                Gunakan Tool →
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- ALL TOOLS -->
+    <section class="tools-section">
+      <h2 class="section-title">
+        📂 Semua Web Tools
+      </h2>
+
+      <div class="tools-grid" id="allTools">
+        {tools.map(tool => (
+          <a
+            href={tool.url}
+            class="tool-card"
+            data-search={`${tool.title} ${tool.description}`}
+          >
+            {tool.icon && (
+              <div class="tool-icon">
+                {tool.icon}
+              </div>
+            )}
+
+            <h3>{tool.title}</h3>
+
+            <p>{tool.description}</p>
+
+            <span class="tool-link">
+              Gunakan Tool →
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- EMPTY -->
+    <div
+      id="emptyState"
+      class="tools-empty"
+      style="display: none;"
+    >
+      <strong>Tool tidak ditemukan</strong>
+      <p>
+        Coba gunakan kata kunci pencarian yang berbeda.
+      </p>
+    </div>
+
+    <!-- SEO CONTENT -->
+    <section class="seo-content">
+
+      <h2>Apa Itu Web Tools?</h2>
+
+      <p>
+        Web tools adalah berbagai alat online yang membantu
+        pekerjaan web development secara cepat dan praktis.
+        Kamu dapat menggunakan tools untuk membuat, mengedit,
+        memformat, dan memproses kode langsung dari browser.
+      </p>
+
+      <h2>Web Tools yang Tersedia</h2>
+
+      <p>
+        AI Mr Ferdy menyediakan berbagai tools untuk kebutuhan
+        HTML, CSS, JavaScript, JSON, dan berbagai pekerjaan
+        web development lainnya.
+      </p>
+
+      <ul>
+        <li>HTML editor dan formatter</li>
+        <li>CSS formatter dan optimizer</li>
+        <li>JavaScript formatter</li>
+        <li>JSON formatter dan validator</li>
+        <li>Berbagai developer tools lainnya</li>
+      </ul>
+
+      <h2>Kenapa Menggunakan Web Tools Online?</h2>
+
+      <p>
+        Dengan web tools online, kamu dapat mengerjakan berbagai
+        kebutuhan development langsung dari browser tanpa harus
+        menginstal software tambahan. Tools dapat digunakan dengan
+        cepat dan praktis.
+      </p>
+
+      <p>
+        👉 <a href="/tools">Lihat semua tools lainnya</a>
+      </p>
+
+    </section>
+
+  </div>
+
+  <!-- SEARCH SCRIPT -->
+  <script>
+    const searchInput = document.getElementById("searchTools");
+    const cards = document.querySelectorAll(".tool-card");
+    const emptyState = document.getElementById("emptyState");
+
+    searchInput?.addEventListener("input", () => {
+      const query = searchInput.value
+        .toLowerCase()
+        .trim();
+
+      let visible = 0;
+
+      cards.forEach((card) => {
+        const text =
+          card.getAttribute("data-search") ||
+          card.textContent ||
+          "";
+
+        const match =
+          text.toLowerCase().includes(query);
+
+        card.style.display = match ? "" : "none";
+
+        if (match) visible++;
+      });
+
+      if (emptyState) {
+        emptyState.style.display =
+          visible === 0 ? "block" : "none";
+      }
+    });
+  </script>
+
+  <!-- SEO JSON-LD -->
+  <script type="application/ld+json">
+    {JSON.stringify(jsonLd)}
+  </script>
+
+</MainLayout>
+
+<style>
+  .tools-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 110px 24px 50px;
+  }
+
+  .tools-hero {
+    max-width: 800px;
+    margin: 0 auto 35px;
+    text-align: center;
+  }
+
+  .tools-eyebrow {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: var(--primary, #3b82f6);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .08em;
+  }
+
+  .tools-hero h1 {
+    margin: 0 0 14px;
+    color: var(--text, #f8fafc);
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.1;
+  }
+
+  .tools-hero p {
+    margin: 0;
+    color: var(--soft, #94a3b8);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .tools-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 700px;
+    margin: 0 auto 35px;
+    overflow: hidden;
+    border: 1px solid var(
+      --border,
+      rgba(255,255,255,.08)
+    );
+    border-radius: 16px;
+    background: var(
+      --card,
+      rgba(15,23,42,.72)
+    );
+  }
+
+  .tools-stats div {
+    padding: 18px;
+    text-align: center;
+  }
+
+  .tools-stats strong {
+    display: block;
+    color: var(--text, #f8fafc);
+    font-size: 22px;
+  }
+
+  .tools-stats span {
+    display: block;
+    margin-top: 4px;
+    color: var(--soft, #94a3b8);
+    font-size: 13px;
+  }
+
+  .tools-search {
+    max-width: 650px;
+    margin: 0 auto 40px;
+  }
+
+  .tools-search input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 18px;
+    border: 1px solid var(
+      --border,
+      rgba(255,255,255,.08)
+    );
+    border-radius: 12px;
+    outline: none;
+    background: var(
+      --card,
+      rgba(15,23,42,.72)
+    );
+    color: var(--text, #f8fafc);
+    font: inherit;
+  }
+
+  .tools-search input::placeholder {
+    color: var(--soft, #94a3b8);
+  }
+
+  .tools-search input:focus {
+    border-color: var(--primary, #3b82f6);
+  }
+
+  .tools-section {
+    margin-bottom: 45px;
+  }
+
+  .section-title {
+    margin: 0 0 20px;
+    color: var(--text, #f8fafc);
+    font-size: 24px;
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .tool-card {
+    position: relative;
+    display: block;
+    padding: 22px;
+    color: inherit;
+    text-decoration: none;
+    border: 1px solid var(
+      --border,
+      rgba(255,255,255,.08)
+    );
+    border-radius: 18px;
+    background: var(
+      --card,
+      rgba(15,23,42,.72)
+    );
+    transition:
+      transform .2s ease,
+      border-color .2s ease,
+      box-shadow .2s ease;
+  }
+
+  .tool-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(59,130,246,.4);
+    box-shadow: 0 12px 35px rgba(0,0,0,.18);
+  }
+
+  .tool-card.popular {
+    border-color: rgba(59,130,246,.25);
+  }
+
+  .tool-icon {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 14px;
+    border-radius: 13px;
+    background: rgba(59,130,246,.12);
+    font-size: 24px;
+  }
+
+  .tool-card h3 {
+    margin: 0 0 8px;
+    color: var(--text, #f8fafc);
+    font-size: 18px;
+  }
+
+  .tool-card p {
+    margin: 0;
+    color: var(--soft, #94a3b8);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .tool-link {
+    display: inline-block;
+    margin-top: 15px;
+    color: var(--primary, #3b82f6);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: var(--primary, #3b82f6);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .tools-empty {
+    padding: 35px 20px;
+    margin-bottom: 40px;
+    text-align: center;
+    border: 1px dashed var(
+      --border,
+      rgba(255,255,255,.08)
+    );
+    border-radius: 16px;
+    color: var(--soft, #94a3b8);
+  }
+
+  .tools-empty strong {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text, #f8fafc);
+  }
+
+  .tools-empty p {
+    margin: 0;
+  }
+
+  .seo-content {
+    max-width: 850px;
+    margin: 60px auto 0;
+    color: var(--soft, #94a3b8);
+    line-height: 1.8;
+  }
+
+  .seo-content h2 {
+    margin: 35px 0 10px;
+    color: var(--text, #f8fafc);
+    font-size: 24px;
+  }
+
+  .seo-content h2:first-child {
+    margin-top: 0;
+  }
+
+  .seo-content p {
+    margin: 0 0 16px;
+  }
+
+  .seo-content ul {
+    padding-left: 22px;
+  }
+
+  .seo-content a {
+    color: var(--primary, #3b82f6);
+    text-decoration: none;
+  }
+
+  .seo-content a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 900px) {
+    .tools-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 600px) {
+    .tools-container {
+      padding: 96px 16px 35px;
+    }
+
+    .tools-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .tools-stats strong {
+      font-size: 18px;
+    }
+
+    .tools-stats div {
+      padding: 14px 8px;
+    }
+
+    .section-title {
+      font-size: 21px;
+    }
+  }
+</style>
+

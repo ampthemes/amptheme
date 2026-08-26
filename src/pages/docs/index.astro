@@ -1,60 +1,51 @@
 ---
+import { getCollection } from "astro:content";
 import MainLayout from "../../layouts/MainLayout.astro";
 import "../../styles/docs.css";
 
-const sections = [
-  {
-    title: "Getting Started",
-    items: [
-      {
-        title: "Getting Started",
-        description: "Mulai menggunakan dan memahami dokumentasi.",
-        href: "/docs/getting-started/",
-      },
-    ],
+const docs = await getCollection("docs");
+
+/*
+ * Group berdasarkan category
+ */
+const groupedDocs = docs.reduce(
+  (groups, doc) => {
+    const category = doc.data.category || "Documentation";
+
+    if (!groups[category]) {
+      groups[category] = [];
+    }
+
+    groups[category].push(doc);
+
+    return groups;
   },
-  {
-    title: "Tools",
-    items: [
-      {
-        title: "Tools Overview",
-        description: "Daftar dan panduan penggunaan tools.",
-        href: "/docs/tools/",
-      },
-    ],
-  },
-  {
-    title: "Products",
-    items: [
-      {
-        title: "Products Overview",
-        description: "Dokumentasi produk dan fitur yang tersedia.",
-        href: "/docs/products/",
-      },
-    ],
-  },
-  {
-    title: "Blog",
-    items: [
-      {
-        title: "Blog Documentation",
-        description: "Panduan struktur dan pengelolaan blog.",
-        href: "/docs/blog/",
-      },
-    ],
-  },
-];
+  {} as Record<string, typeof docs>
+);
+
+/*
+ * Urutkan setiap category berdasarkan order
+ */
+for (const category in groupedDocs) {
+  groupedDocs[category].sort(
+    (a, b) =>
+      (a.data.order ?? 999) -
+      (b.data.order ?? 999)
+  );
+}
 ---
 
 <MainLayout
-  title="Docs"
-  description="Documentation and guides."
+  title="Documentation"
+  description="Documentation, guides, and references."
 >
   <main class="docs-page">
+
     <div class="docs-shell">
 
       <!-- SIDEBAR -->
       <aside class="docs-sidebar">
+
         <div class="docs-filter">
           <svg
             viewBox="0 0 24 24"
@@ -70,6 +61,7 @@ const sections = [
               stroke="currentColor"
               stroke-width="2"
             />
+
             <line
               x1="21"
               y1="21"
@@ -90,30 +82,54 @@ const sections = [
         </div>
 
         <nav aria-label="Documentation">
-          {sections.map((section) => (
-            <div class="docs-section" data-docs-section>
-              <p class="docs-section-title">
-                {section.title}
-              </p>
 
-              <ul>
-                {section.items.map((item) => (
-                  <li data-docs-item={item.title.toLowerCase()}>
-                    <a href={item.href} class="docs-link">
-                      {item.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {Object.entries(groupedDocs).map(
+            ([category, items]) => (
+
+              <div
+                class="docs-section"
+                data-docs-section
+              >
+
+                <p class="docs-section-title">
+                  {category}
+                </p>
+
+                <ul>
+
+                  {items.map((doc) => (
+
+                    <li
+                      data-docs-item={doc.data.title.toLowerCase()}
+                    >
+                      <a
+                        href={`/docs/${doc.id}/`}
+                        class="docs-link"
+                      >
+                        {doc.data.title}
+                      </a>
+                    </li>
+
+                  ))}
+
+                </ul>
+
+              </div>
+
+            )
+          )}
+
         </nav>
+
       </aside>
 
+
       <!-- CONTENT -->
+
       <section class="docs-content">
 
-        <div class="docs-hero">
+        <header class="docs-hero">
+
           <span class="docs-eyebrow">
             Documentation
           </span>
@@ -123,85 +139,122 @@ const sections = [
           </h1>
 
           <p class="docs-lead">
-            Panduan, referensi, dan dokumentasi untuk memahami
-            platform, tools, products, dan sistem yang tersedia.
+            Panduan, referensi, dan dokumentasi
+            untuk platform ini.
           </p>
-        </div>
+
+        </header>
+
 
         <div class="docs-grid">
 
-          {sections.map((section) => (
-            <section class="docs-card-section">
+          {Object.entries(groupedDocs).map(
+            ([category, items]) => (
 
-              <div class="docs-card-heading">
-                <h2>{section.title}</h2>
-              </div>
+              <section class="docs-card-section">
 
-              <div class="docs-card-list">
+                <div class="docs-card-heading">
+                  <h2>
+                    {category}
+                  </h2>
+                </div>
 
-                {section.items.map((item) => (
-                  <a
-                    href={item.href}
-                    class="docs-card"
-                  >
-                    <div>
-                      <h3>{item.title}</h3>
+                <div class="docs-card-list">
 
-                      <p>
-                        {item.description}
-                      </p>
-                    </div>
+                  {items.map((doc) => (
 
-                    <span class="docs-card-arrow">
-                      →
-                    </span>
-                  </a>
-                ))}
+                    <a
+                      href={`/docs/${doc.id}/`}
+                      class="docs-card"
+                    >
 
-              </div>
+                      <div>
 
-            </section>
-          ))}
+                        <h3>
+                          {doc.data.title}
+                        </h3>
+
+                        <p>
+                          {doc.data.description}
+                        </p>
+
+                      </div>
+
+                      <span class="docs-card-arrow">
+                        →
+                      </span>
+
+                    </a>
+
+                  ))}
+
+                </div>
+
+              </section>
+
+            )
+          )}
 
         </div>
 
       </section>
 
     </div>
+
   </main>
 
+
   <script>
-    const filter = document.querySelector("#docs-filter");
+    const filter =
+      document.querySelector("#docs-filter");
 
     const sections =
-      document.querySelectorAll("[data-docs-section]");
+      document.querySelectorAll(
+        "[data-docs-section]"
+      );
 
     filter?.addEventListener("input", () => {
+
       const query =
-        (filter as HTMLInputElement).value
+        (filter as HTMLInputElement)
+          .value
           .trim()
           .toLowerCase();
 
       sections.forEach((section) => {
+
         let visible = 0;
 
         section
           .querySelectorAll("[data-docs-item]")
           .forEach((item) => {
-            const text =
-              item.getAttribute("data-docs-item") || "";
 
-            const match = text.includes(query);
+            const title =
+              item.getAttribute(
+                "data-docs-item"
+              ) || "";
 
-            (item as HTMLElement).style.display =
+            const match =
+              title.includes(query);
+
+            (
+              item as HTMLElement
+            ).style.display =
               match ? "" : "none";
 
-            if (match) visible++;
+            if (match) {
+              visible++;
+            }
+
           });
 
-        (section as HTMLElement).style.display =
+        (
+          section as HTMLElement
+        ).style.display =
           visible > 0 ? "" : "none";
+
       });
+
     });
   </script>
 </MainLayout>

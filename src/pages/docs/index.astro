@@ -5,6 +5,11 @@ import "../../styles/docs.css";
 
 const docs = await getCollection("docs");
 
+/*
+ * Group docs berdasarkan category.
+ * Jika category tidak ada,
+ * otomatis masuk ke Documentation.
+ */
 const groups = docs.reduce(
   (acc, item) => {
     const category = item.data.category || "Documentation";
@@ -23,9 +28,11 @@ const groups = docs.reduce(
 
 <MainLayout
   title="Documentation"
-  description="Documentation, guides, tools, products, and resources."
+  description="Documentation and guides."
 >
+
   <main class="docs-page">
+
     <div class="docs-shell">
 
       <!-- =================================
@@ -35,6 +42,7 @@ const groups = docs.reduce(
       <aside class="docs-sidebar">
 
         <div class="docs-filter">
+
           <svg
             viewBox="0 0 24 24"
             width="16"
@@ -67,50 +75,56 @@ const groups = docs.reduce(
             placeholder="Filter docs..."
             aria-label="Filter documentation"
           />
+
         </div>
 
 
         <nav aria-label="Documentation">
 
-          {
-            Object.entries(groups).map(
-              ([category, items]) => (
-                <div
-                  class="docs-section"
-                  data-docs-section
-                >
+          {Object.entries(groups).map(
+            ([category, items]) => (
 
-                  <p class="docs-section-title">
-                    {category}
-                  </p>
+              <div
+                class="docs-section"
+                data-docs-section
+              >
 
-                  <ul>
-                    {
-                      items
-                        .sort(
-                          (a, b) =>
-                            (a.data.order ?? 999) -
-                            (b.data.order ?? 999)
-                        )
-                        .map((item) => (
-                          <li
-                            data-docs-item={item.data.title.toLowerCase()}
-                          >
-                            <a
-                              href={`/docs/${item.slug}/`}
-                              class="docs-link"
-                            >
-                              {item.data.title}
-                            </a>
-                          </li>
-                        ))
-                    }
-                  </ul>
+                <p class="docs-section-title">
+                  {category}
+                </p>
 
-                </div>
-              )
+                <ul>
+
+                  {items
+                    .sort(
+                      (a, b) =>
+                        (a.data.order ?? 999) -
+                        (b.data.order ?? 999)
+                    )
+                    .map((item) => (
+
+                      <li
+                        data-docs-item={item.data.title
+                          .toLowerCase()}
+                      >
+
+                        <a
+                          href={`/docs/${item.id}/`}
+                          class="docs-link"
+                        >
+                          {item.data.title}
+                        </a>
+
+                      </li>
+
+                    ))}
+
+                </ul>
+
+              </div>
+
             )
-          }
+          )}
 
         </nav>
 
@@ -118,7 +132,7 @@ const groups = docs.reduce(
 
 
       <!-- =================================
-           DOCUMENTATION CONTENT
+           DOCUMENTATION INDEX
       ================================== -->
 
       <article class="docs-content">
@@ -134,11 +148,12 @@ const groups = docs.reduce(
           </h1>
 
           <p class="docs-lead">
-            Panduan, referensi, dan dokumentasi lengkap
-            untuk tools, products, blog, dan layanan yang tersedia.
+            Panduan, referensi, dan dokumentasi
+            untuk semua fitur dan bagian website.
           </p>
 
         </header>
+
 
         <hr />
 
@@ -147,58 +162,67 @@ const groups = docs.reduce(
              DOCUMENTATION LIST
         ================================== -->
 
-        {
-          Object.entries(groups).map(
+        <div class="docs-index">
+
+          {Object.entries(groups).map(
             ([category, items]) => (
+
               <section class="docs-index-section">
 
                 <h2>
                   {category}
                 </h2>
 
-                <div class="docs-index-list">
+                <div class="docs-index-grid">
 
-                  {
-                    items
-                      .sort(
-                        (a, b) =>
-                          (a.data.order ?? 999) -
-                          (b.data.order ?? 999)
-                      )
-                      .map((item) => (
-                        <a
-                          href={`/docs/${item.slug}/`}
-                          class="docs-index-item"
-                        >
+                  {items
+                    .sort(
+                      (a, b) =>
+                        (a.data.order ?? 999) -
+                        (b.data.order ?? 999)
+                    )
+                    .map((item) => (
 
-                          <div>
-                            <h3>
-                              {item.data.title}
-                            </h3>
+                      <a
+                        href={`/docs/${item.id}/`}
+                        class="docs-card"
+                      >
 
+                        <div class="docs-card-content">
+
+                          <h3>
+                            {item.data.title}
+                          </h3>
+
+                          {item.data.description && (
                             <p>
                               {item.data.description}
                             </p>
-                          </div>
+                          )}
 
-                          <span aria-hidden="true">
-                            →
-                          </span>
+                        </div>
 
-                        </a>
-                      ))
-                  }
+                        <span class="docs-card-arrow">
+                          →
+                        </span>
+
+                      </a>
+
+                    ))}
 
                 </div>
 
               </section>
+
             )
-          )
-        }
+          )}
+
+        </div>
 
       </article>
 
     </div>
+
   </main>
 
 
@@ -216,6 +240,7 @@ const groups = docs.reduce(
       );
 
     filter?.addEventListener("input", () => {
+
       const query =
         (filter as HTMLInputElement)
           .value
@@ -244,11 +269,14 @@ const groups = docs.reduce(
             if (match) {
               visible++;
             }
+
           });
 
         (section as HTMLElement).style.display =
           visible > 0 ? "" : "none";
+
       });
+
     });
   </script>
 

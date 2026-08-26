@@ -59,6 +59,20 @@ const sortedDocs = [...docs].sort(
 
 /*
  * =====================================
+ * URL HELPER
+ *
+ * Menghilangkan .md / .mdx
+ * dari URL jika masih terdapat
+ * pada id collection.
+ * =====================================
+ */
+
+const docUrl = (id: string) =>
+  `/docs/${id.replace(/\.(md|mdx)$/, "")}/`;
+
+
+/*
+ * =====================================
  * GROUP DOCUMENTS
  * =====================================
  */
@@ -170,92 +184,105 @@ const next =
 
           {
             Object.entries(groups).map(
-              ([category, items]) => (
+              ([category, items]) => {
 
-                <details
-                  class="docs-section"
-                  open
-                  data-docs-section
-                >
+                /*
+                 * Category otomatis terbuka
+                 * hanya jika document aktif
+                 * berada di dalam category ini.
+                 */
 
-                  <!-- CATEGORY -->
+                const isOpen =
+                  items.some(
+                    (item) =>
+                      item.id === doc.id
+                  );
 
-                  <summary class="docs-section-title">
+                return (
 
-                    <span>
-                      {category}
-                    </span>
+                  <details
+                    class="docs-section"
+                    open={isOpen}
+                    data-docs-section
+                  >
 
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="16"
-                      height="16"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M6 9l6 6 6-6"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
+                    <!-- CATEGORY -->
 
-                  </summary>
+                    <summary class="docs-section-title">
+
+                      <span>
+                        {category}
+                      </span>
+
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="16"
+                        height="16"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M6 9l6 6 6-6"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+
+                    </summary>
 
 
-                  <!-- DOCUMENTS -->
+                    <!-- DOCUMENTS -->
 
-                  <ul>
+                    <ul>
 
-                    {
-                      items.map((item) => {
+                      {
+                        items.map((item) => {
 
-                        const href =
-                          `/docs/${item.id}/`;
+                          const active =
+                            item.id === doc.id;
 
-                        const active =
-                          item.id === doc.id;
+                          return (
 
-                        return (
-
-                          <li
-                            data-docs-item={
-                              item.data.title
-                                .toLowerCase()
-                            }
-                          >
-
-                            <a
-                              href={href}
-                              class:list={[
-                                "docs-link",
-                                {
-                                  active,
-                                },
-                              ]}
-                              aria-current={
-                                active
-                                  ? "page"
-                                  : undefined
+                            <li
+                              data-docs-item={
+                                item.data.title
+                                  .toLowerCase()
                               }
                             >
-                              {item.data.title}
-                            </a>
 
-                          </li>
+                              <a
+                                href={docUrl(item.id)}
+                                class:list={[
+                                  "docs-link",
+                                  {
+                                    active,
+                                  },
+                                ]}
+                                aria-current={
+                                  active
+                                    ? "page"
+                                    : undefined
+                                }
+                              >
+                                {item.data.title}
+                              </a>
 
-                        );
+                            </li>
 
-                      })
-                    }
+                          );
 
-                  </ul>
+                        })
+                      }
 
-                </details>
+                    </ul>
 
-              )
+                  </details>
+
+                );
+
+              }
             )
           }
 
@@ -324,7 +351,7 @@ const next =
                 previous ? (
 
                   <a
-                    href={`/docs/${previous.id}/`}
+                    href={docUrl(previous.id)}
                     class="docs-pagination-item previous"
                   >
 
@@ -350,7 +377,7 @@ const next =
                 next ? (
 
                   <a
-                    href={`/docs/${next.id}/`}
+                    href={docUrl(next.id)}
                     class="docs-pagination-item next"
                   >
 
@@ -385,9 +412,10 @@ const next =
 
   <!-- =====================================
        DOCS FILTER
-       Hanya untuk pencarian.
-       Collapse menggunakan <details>
-       sehingga tidak membutuhkan JS.
+       
+       Hanya filter menggunakan JS.
+       Collapse category menggunakan
+       native <details>, tanpa JS.
   ====================================== -->
 
   <script>

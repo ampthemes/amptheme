@@ -3,44 +3,73 @@ import { getCollection } from "astro:content";
 import MainLayout from "../../layouts/MainLayout.astro";
 import "../../styles/docs.css";
 
+/*
+ * =====================================
+ * ALL DOCUMENTS
+ * =====================================
+ */
+
 const docs = await getCollection("docs");
 
-const sections = Object.entries(
-  docs.reduce(
-    (groups, doc) => {
-      const category = doc.data.category || "Documentation";
 
-      if (!groups[category]) {
-        groups[category] = [];
-      }
+/*
+ * =====================================
+ * SORT DOCUMENTS
+ * =====================================
+ */
 
-      groups[category].push(doc);
+const sortedDocs = [...docs].sort(
+  (a, b) =>
+    (a.data.order ?? 999) -
+    (b.data.order ?? 999)
+);
 
-      return groups;
-    },
-    {} as Record<string, typeof docs>
-  )
-).map(([title, items]) => ({
-  title,
-  items: items.sort(
-    (a, b) =>
-      (a.data.order ?? 999) -
-      (b.data.order ?? 999)
-  ),
-}));
+
+/*
+ * =====================================
+ * GROUP DOCUMENTS BY CATEGORY
+ * =====================================
+ */
+
+const groups = sortedDocs.reduce(
+  (acc, item) => {
+
+    const category =
+      item.data.category ||
+      "Documentation";
+
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+
+    acc[category].push(item);
+
+    return acc;
+  },
+  {} as Record<string, typeof docs>
+);
 ---
 
 <MainLayout
   title="Docs"
   description="Documentation and guides."
 >
+
   <main class="docs-page">
+
     <div class="docs-shell">
 
-      <!-- SIDEBAR -->
+
+      <!-- =================================
+           SIDEBAR
+      ================================== -->
+
       <aside class="docs-sidebar">
 
+        <!-- FILTER -->
+
         <div class="docs-filter">
+
           <svg
             viewBox="0 0 24 24"
             width="16"
@@ -73,41 +102,94 @@ const sections = Object.entries(
             placeholder="Filter docs..."
             aria-label="Filter documentation"
           />
+
         </div>
 
-        <nav aria-label="Documentation">
-          {sections.map((section) => (
-            <div
-              class="docs-section"
-              data-docs-section
-            >
-              <p class="docs-section-title">
-                {section.title}
-              </p>
 
-              <ul>
-                {section.items.map((item) => (
-                  <li
-                    data-docs-item={item.data.title.toLowerCase()}
-                  >
-                    <a
-                      href={`/docs/${item.slug}/`}
-                      class="docs-link"
+        <!-- DOCUMENTATION NAVIGATION -->
+
+        <nav aria-label="Documentation">
+
+          {
+            Object.entries(groups).map(
+              ([category, items]) => (
+
+                <details
+                  class="docs-section"
+                  open
+                  data-docs-section
+                >
+
+                  <summary class="docs-section-title">
+
+                    <span>
+                      {category}
+                    </span>
+
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="16"
+                      height="16"
+                      aria-hidden="true"
                     >
-                      {item.data.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+                      <path
+                        d="M6 9l6 6 6-6"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+
+                  </summary>
+
+
+                  <ul>
+
+                    {
+                      items.map((item) => (
+
+                        <li
+                          data-docs-item={
+                            item.data.title
+                              .toLowerCase()
+                          }
+                        >
+
+                          <a
+                            href={`/docs/${item.id}/`}
+                            class="docs-link"
+                          >
+                            {item.data.title}
+                          </a>
+
+                        </li>
+
+                      ))
+                    }
+
+                  </ul>
+
+                </details>
+
+              )
+            )
+          }
+
         </nav>
 
       </aside>
 
 
-      <!-- CONTENT -->
+      <!-- =================================
+           DOCUMENTATION CONTENT
+      ================================== -->
+
       <section class="docs-content">
+
+
+        <!-- HERO -->
 
         <div class="docs-hero">
 
@@ -120,62 +202,93 @@ const sections = Object.entries(
           </h1>
 
           <p class="docs-lead">
-            Panduan, referensi, dan dokumentasi untuk memahami
-            platform, tools, products, dan sistem yang tersedia.
+            Panduan, referensi, dan dokumentasi untuk
+            memahami platform, tools, products, dan sistem
+            yang tersedia.
           </p>
 
         </div>
 
 
-        <!-- GRID -->
+        <!-- =================================
+             DOCUMENTATION GRID
+        ================================== -->
+
         <div class="docs-grid">
 
-          {sections.map((section) => (
-            <section class="docs-card-section">
+          {
+            Object.entries(groups).map(
+              ([category, items]) => (
 
-              <div class="docs-card-heading">
-                <h2>
-                  {section.title}
-                </h2>
-              </div>
+                <section class="docs-card-section">
 
-              <div class="docs-card-list">
+                  <div class="docs-card-heading">
 
-                {section.items.map((item) => (
-                  <a
-                    href={`/docs/${item.slug}/`}
-                    class="docs-card"
-                  >
-                    <div>
-                      <h3>
-                        {item.data.title}
-                      </h3>
+                    <h2>
+                      {category}
+                    </h2>
 
-                      <p>
-                        {item.data.description}
-                      </p>
-                    </div>
+                  </div>
 
-                    <span class="docs-card-arrow">
-                      →
-                    </span>
-                  </a>
-                ))}
 
-              </div>
+                  <div class="docs-card-list">
 
-            </section>
-          ))}
+                    {
+                      items.map((item) => (
+
+                        <a
+                          href={`/docs/${item.id}/`}
+                          class="docs-card"
+                        >
+
+                          <div>
+
+                            <h3>
+                              {item.data.title}
+                            </h3>
+
+                            <p>
+                              {item.data.description}
+                            </p>
+
+                          </div>
+
+
+                          <span
+                            class="docs-card-arrow"
+                            aria-hidden="true"
+                          >
+                            →
+                          </span>
+
+                        </a>
+
+                      ))
+                    }
+
+                  </div>
+
+                </section>
+
+              )
+            )
+          }
 
         </div>
 
       </section>
 
     </div>
+
   </main>
 
 
-  <!-- DOCS FILTER -->
+  <!-- =====================================
+       DOCS FILTER
+       Collapse kategori tetap native <details>.
+       JS hanya digunakan untuk filter.
+  ====================================== -->
+
   <script>
     const filter =
       document.querySelector("#docs-filter");
@@ -193,9 +306,11 @@ const sections = Object.entries(
           .trim()
           .toLowerCase();
 
+
       sections.forEach((section) => {
 
         let visible = 0;
+
 
         section
           .querySelectorAll("[data-docs-item]")
@@ -206,20 +321,35 @@ const sections = Object.entries(
                 "data-docs-item"
               ) || "";
 
+
             const match =
               text.includes(query);
 
-            (item as HTMLElement).style.display =
-              match ? "" : "none";
+
+            (
+              item as HTMLElement
+            ).style.display =
+              match
+                ? ""
+                : "none";
+
 
             if (match) {
               visible++;
             }
+
           });
 
-        (section as HTMLElement).style.display =
-          visible > 0 ? "" : "none";
+
+        (
+          section as HTMLElement
+        ).style.display =
+          visible > 0
+            ? ""
+            : "none";
+
       });
+
     });
   </script>
 

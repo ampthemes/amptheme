@@ -5,31 +5,29 @@ import "../../styles/docs.css";
 
 const docs = await getCollection("docs");
 
-/*
- * Group otomatis berdasarkan frontmatter:
- *
- * category: Getting Started
- * category: Tools
- * category: Products
- * category: Blog
- *
- * Tidak perlu lagi menulis sections secara manual.
- */
+const sections = Object.entries(
+  docs.reduce(
+    (groups, doc) => {
+      const category = doc.data.category || "Documentation";
 
-const sections = docs.reduce(
-  (groups, doc) => {
-    const category = doc.data.category || "Documentation";
+      if (!groups[category]) {
+        groups[category] = [];
+      }
 
-    if (!groups[category]) {
-      groups[category] = [];
-    }
+      groups[category].push(doc);
 
-    groups[category].push(doc);
-
-    return groups;
-  },
-  {} as Record<string, typeof docs>
-);
+      return groups;
+    },
+    {} as Record<string, typeof docs>
+  )
+).map(([title, items]) => ({
+  title,
+  items: items.sort(
+    (a, b) =>
+      (a.data.order ?? 999) -
+      (b.data.order ?? 999)
+  ),
+}));
 ---
 
 <MainLayout
@@ -43,7 +41,6 @@ const sections = docs.reduce(
       <aside class="docs-sidebar">
 
         <div class="docs-filter">
-
           <svg
             viewBox="0 0 24 24"
             width="16"
@@ -76,56 +73,34 @@ const sections = docs.reduce(
             placeholder="Filter docs..."
             aria-label="Filter documentation"
           />
-
         </div>
 
-
         <nav aria-label="Documentation">
+          {sections.map((section) => (
+            <div
+              class="docs-section"
+              data-docs-section
+            >
+              <p class="docs-section-title">
+                {section.title}
+              </p>
 
-          {Object.entries(sections).map(
-            ([category, items]) => (
-
-              <div
-                class="docs-section"
-                data-docs-section
-              >
-
-                <p class="docs-section-title">
-                  {category}
-                </p>
-
-                <ul>
-
-                  {items
-                    .sort(
-                      (a, b) =>
-                        (a.data.order ?? 999) -
-                        (b.data.order ?? 999)
-                    )
-                    .map((doc) => (
-
-                      <li
-                        data-docs-item={doc.data.title.toLowerCase()}
-                      >
-
-                        <a
-                          href={`/docs/${doc.id}/`}
-                          class="docs-link"
-                        >
-                          {doc.data.title}
-                        </a>
-
-                      </li>
-
-                    ))}
-
-                </ul>
-
-              </div>
-
-            )
-          )}
-
+              <ul>
+                {section.items.map((item) => (
+                  <li
+                    data-docs-item={item.data.title.toLowerCase()}
+                  >
+                    <a
+                      href={`/docs/${item.id}/`}
+                      class="docs-link"
+                    >
+                      {item.data.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </nav>
 
       </aside>
@@ -152,64 +127,45 @@ const sections = docs.reduce(
         </div>
 
 
-        <!-- GRID TETAP SAMA -->
+        <!-- GRID -->
         <div class="docs-grid">
 
-          {Object.entries(sections).map(
-            ([category, items]) => (
+          {sections.map((section) => (
+            <section class="docs-card-section">
 
-              <section class="docs-card-section">
+              <div class="docs-card-heading">
+                <h2>
+                  {section.title}
+                </h2>
+              </div>
 
-                <div class="docs-card-heading">
+              <div class="docs-card-list">
 
-                  <h2>
-                    {category}
-                  </h2>
+                {section.items.map((item) => (
+                  <a
+                    href={`/docs/${item.id}/`}
+                    class="docs-card"
+                  >
+                    <div>
+                      <h3>
+                        {item.data.title}
+                      </h3>
 
-                </div>
+                      <p>
+                        {item.data.description}
+                      </p>
+                    </div>
 
+                    <span class="docs-card-arrow">
+                      →
+                    </span>
+                  </a>
+                ))}
 
-                <div class="docs-card-list">
+              </div>
 
-                  {items
-                    .sort(
-                      (a, b) =>
-                        (a.data.order ?? 999) -
-                        (b.data.order ?? 999)
-                    )
-                    .map((doc) => (
-
-                      <a
-                        href={`/docs/${doc.id}/`}
-                        class="docs-card"
-                      >
-
-                        <div>
-
-                          <h3>
-                            {doc.data.title}
-                          </h3>
-
-                          <p>
-                            {doc.data.description}
-                          </p>
-
-                        </div>
-
-                        <span class="docs-card-arrow">
-                          →
-                        </span>
-
-                      </a>
-
-                    ))}
-
-                </div>
-
-              </section>
-
-            )
-          )}
+            </section>
+          ))}
 
         </div>
 
@@ -219,6 +175,7 @@ const sections = docs.reduce(
   </main>
 
 
+  <!-- DOCS FILTER -->
   <script>
     const filter =
       document.querySelector("#docs-filter");
@@ -258,14 +215,11 @@ const sections = docs.reduce(
             if (match) {
               visible++;
             }
-
           });
 
         (section as HTMLElement).style.display =
           visible > 0 ? "" : "none";
-
       });
-
     });
   </script>
 

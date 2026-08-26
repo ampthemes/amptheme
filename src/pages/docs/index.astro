@@ -27,6 +27,19 @@ const sortedDocs = [...docs].sort(
 
 /*
  * =====================================
+ * DOCUMENT URL
+ *
+ * Pastikan URL tidak mengandung
+ * .md atau .mdx.
+ * =====================================
+ */
+
+const docUrl = (id: string) =>
+  `/docs/${id.replace(/\.(md|mdx)$/, "")}/`;
+
+
+/*
+ * =====================================
  * GROUP DOCUMENTS BY CATEGORY
  * =====================================
  */
@@ -106,7 +119,9 @@ const groups = sortedDocs.reduce(
         </div>
 
 
-        <!-- DOCUMENTATION NAVIGATION -->
+        <!-- =================================
+             DOCUMENTATION NAVIGATION
+        ================================== -->
 
         <nav aria-label="Documentation">
 
@@ -116,9 +131,10 @@ const groups = sortedDocs.reduce(
 
                 <details
                   class="docs-section"
-                  open
                   data-docs-section
                 >
+
+                  <!-- CATEGORY -->
 
                   <summary class="docs-section-title">
 
@@ -145,6 +161,8 @@ const groups = sortedDocs.reduce(
                   </summary>
 
 
+                  <!-- DOCUMENTS -->
+
                   <ul>
 
                     {
@@ -158,7 +176,7 @@ const groups = sortedDocs.reduce(
                         >
 
                           <a
-                            href={`/docs/${item.id}/`}
+                            href={docUrl(item.id)}
                             class="docs-link"
                           >
                             {item.data.title}
@@ -237,7 +255,7 @@ const groups = sortedDocs.reduce(
                       items.map((item) => (
 
                         <a
-                          href={`/docs/${item.id}/`}
+                          href={docUrl(item.id)}
                           class="docs-card"
                         >
 
@@ -285,8 +303,11 @@ const groups = sortedDocs.reduce(
 
   <!-- =====================================
        DOCS FILTER
-       Collapse kategori tetap native <details>.
-       JS hanya digunakan untuk filter.
+
+       Collapse kategori menggunakan
+       native <details>.
+       
+       JavaScript hanya untuk filter.
   ====================================== -->
 
   <script>

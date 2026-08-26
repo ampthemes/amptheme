@@ -1,0 +1,987 @@
+/* =========================================================
+   DOCS
+   Shared styling for:
+   /docs/
+   /docs/[slug]/
+========================================================= */
+
+
+/* =========================================================
+   DOCS PAGE
+========================================================= */
+
+.docs-page{
+  width:100%;
+  max-width:1200px;
+
+  margin:0 auto;
+  padding:40px 24px 80px;
+
+  color:var(--text);
+}
+
+
+/* =========================================================
+   DOCS SHELL
+========================================================= */
+
+.docs-shell{
+  display:grid;
+
+  grid-template-columns:
+    240px minmax(0,1fr);
+
+  gap:56px;
+
+  align-items:start;
+}
+
+
+/* =========================================================
+   DOCS SIDEBAR
+========================================================= */
+
+.docs-sidebar{
+  position:sticky;
+
+  top:84px;
+
+  min-width:0;
+}
+
+
+/* =========================================================
+   SIDEBAR SEARCH
+========================================================= */
+
+.docs-filter{
+  position:relative;
+
+  display:flex;
+  align-items:center;
+
+  width:100%;
+
+  margin-bottom:28px;
+
+  background:var(--surface);
+
+  border:1px solid var(--border);
+  border-radius:10px;
+
+  transition:
+    border-color var(--transition),
+    background var(--transition),
+    box-shadow var(--transition);
+}
+
+.docs-filter:focus-within{
+  border-color:var(--primary);
+
+  box-shadow:
+    0 0 0 3px rgb(26 115 232 / .10);
+}
+
+html[data-theme="dark"] .docs-filter:focus-within{
+  box-shadow:
+    0 0 0 3px rgb(138 180 248 / .10);
+}
+
+.docs-filter-icon{
+  width:18px;
+  height:18px;
+
+  margin-left:13px;
+
+  flex-shrink:0;
+
+  color:var(--text-secondary);
+}
+
+.docs-filter input{
+  width:100%;
+
+  min-width:0;
+
+  height:42px;
+
+  padding:0 13px;
+
+  color:var(--text);
+
+  background:transparent;
+
+  border:0;
+  outline:0;
+
+  font-size:14px;
+}
+
+.docs-filter input::placeholder{
+  color:var(--text-secondary);
+}
+
+.docs-filter input:focus{
+  outline:0;
+}
+
+
+/* =========================================================
+   SIDEBAR NAVIGATION
+========================================================= */
+
+.docs-nav{
+  display:flex;
+
+  flex-direction:column;
+
+  gap:28px;
+}
+
+
+/* =========================================================
+   DOCS SECTION
+========================================================= */
+
+.docs-section{
+  min-width:0;
+}
+
+.docs-section-title{
+  margin:0 0 9px;
+
+  color:var(--text-secondary);
+
+  font-size:11px;
+  font-weight:700;
+
+  line-height:1.4;
+
+  letter-spacing:.08em;
+
+  text-transform:uppercase;
+}
+
+
+/* =========================================================
+   DOCS LIST
+========================================================= */
+
+.docs-section ul{
+  list-style:none;
+
+  margin:0;
+  padding:0;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:2px;
+}
+
+
+/* =========================================================
+   DOCS LINK
+========================================================= */
+
+.docs-link{
+  display:block;
+
+  width:100%;
+
+  padding:8px 12px;
+
+  color:var(--text-secondary);
+
+  border-left:2px solid transparent;
+  border-radius:0 8px 8px 0;
+
+  font-size:14px;
+  line-height:1.45;
+
+  transition:
+    color var(--transition),
+    background var(--transition),
+    border-color var(--transition);
+}
+
+.docs-link:hover{
+  color:var(--text);
+
+  background:var(--surface-hover);
+}
+
+.docs-link.active{
+  color:var(--primary);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--primary) 10%,
+      transparent
+    );
+
+  border-left-color:var(--primary);
+
+  font-weight:600;
+}
+
+
+/* =========================================================
+   HIDDEN FILTER ITEMS
+========================================================= */
+
+.docs-section[data-hidden]{
+  display:none;
+}
+
+.docs-item-hidden{
+  display:none !important;
+}
+
+
+/* =========================================================
+   DOCS CONTENT
+========================================================= */
+
+.docs-content{
+  min-width:0;
+
+  max-width:820px;
+
+  color:var(--text);
+
+  font-size:16px;
+  line-height:1.8;
+}
+
+
+/* =========================================================
+   DOCS HEADER
+========================================================= */
+
+.docs-content-header{
+  margin-bottom:30px;
+}
+
+.docs-content-header h1{
+  margin:0 0 12px;
+
+  color:var(--text);
+
+  font-size:
+    clamp(
+      2rem,
+      5vw,
+      3.2rem
+    );
+
+  font-weight:700;
+
+  line-height:1.15;
+
+  letter-spacing:-.025em;
+}
+
+.docs-description{
+  max-width:720px;
+
+  margin:0;
+
+  color:var(--text-secondary);
+
+  font-size:18px;
+
+  line-height:1.7;
+}
+
+
+/* =========================================================
+   DOCS DIVIDER
+========================================================= */
+
+.docs-content hr{
+  margin:32px 0;
+
+  border:0;
+
+  border-top:1px solid var(--border);
+}
+
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+.docs-content h1,
+.docs-content h2,
+.docs-content h3,
+.docs-content h4,
+.docs-content h5,
+.docs-content h6{
+  color:var(--text);
+
+  line-height:1.25;
+
+  scroll-margin-top:90px;
+}
+
+.docs-content h2{
+  margin:48px 0 16px;
+
+  font-size:1.8rem;
+
+  letter-spacing:-.02em;
+}
+
+.docs-content h3{
+  margin:36px 0 12px;
+
+  font-size:1.35rem;
+}
+
+.docs-content h4{
+  margin:28px 0 10px;
+
+  font-size:1.1rem;
+}
+
+.docs-content p{
+  margin:0 0 20px;
+
+  color:var(--text);
+}
+
+.docs-content strong,
+.docs-content b{
+  color:var(--text);
+
+  font-weight:700;
+}
+
+.docs-content a{
+  color:var(--primary);
+
+  text-decoration:underline;
+  text-decoration-thickness:1px;
+  text-underline-offset:3px;
+
+  transition:
+    color var(--transition);
+}
+
+.docs-content a:hover{
+  color:var(--text);
+}
+
+
+/* =========================================================
+   LEAD
+========================================================= */
+
+.docs-content .lead{
+  margin-bottom:0;
+
+  color:var(--text-secondary);
+
+  font-size:18px;
+
+  line-height:1.7;
+}
+
+
+/* =========================================================
+   LISTS
+========================================================= */
+
+.docs-content ul,
+.docs-content ol{
+  margin:0 0 24px;
+
+  padding-left:26px;
+}
+
+.docs-content li{
+  margin:7px 0;
+
+  padding-left:4px;
+}
+
+.docs-content li::marker{
+  color:var(--text-secondary);
+}
+
+
+/* =========================================================
+   INLINE CODE
+========================================================= */
+
+.docs-content code{
+  padding:3px 6px;
+
+  color:var(--primary);
+
+  background:var(--surface);
+
+  border:1px solid var(--border);
+
+  border-radius:6px;
+
+  font-family:
+    "SFMono-Regular",
+    "Roboto Mono",
+    Consolas,
+    monospace;
+
+  font-size:.88em;
+}
+
+
+/* =========================================================
+   CODE BLOCK
+========================================================= */
+
+.docs-content pre{
+  width:100%;
+
+  margin:24px 0;
+
+  padding:20px;
+
+  overflow-x:auto;
+
+  background:
+    #111827;
+
+  border:1px solid var(--border);
+
+  border-radius:12px;
+
+  box-shadow:var(--shadow);
+
+  -webkit-overflow-scrolling:touch;
+}
+
+.docs-content pre code{
+  display:block;
+
+  padding:0;
+
+  color:#e5e7eb;
+
+  background:transparent;
+
+  border:0;
+  border-radius:0;
+
+  font-family:
+    "SFMono-Regular",
+    "Roboto Mono",
+    Consolas,
+    monospace;
+
+  font-size:13px;
+
+  line-height:1.75;
+
+  white-space:pre;
+
+  tab-size:2;
+}
+
+
+/* =========================================================
+   BLOCKQUOTE
+========================================================= */
+
+.docs-content blockquote{
+  margin:28px 0;
+
+  padding:16px 20px;
+
+  color:var(--text);
+
+  background:var(--surface);
+
+  border-left:3px solid var(--primary);
+  border-top:1px solid var(--border);
+  border-right:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+
+  border-radius:0 10px 10px 0;
+}
+
+.docs-content blockquote p{
+  margin:0;
+
+  color:var(--text-secondary);
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.docs-content table{
+  width:100%;
+
+  margin:28px 0;
+
+  border-collapse:separate;
+  border-spacing:0;
+
+  overflow:hidden;
+
+  background:var(--surface);
+
+  border:1px solid var(--border);
+
+  border-radius:12px;
+
+  font-size:14px;
+}
+
+.docs-content thead{
+  background:var(--surface-hover);
+}
+
+.docs-content th,
+.docs-content td{
+  padding:12px 14px;
+
+  text-align:left;
+
+  border-bottom:1px solid var(--border);
+
+  vertical-align:top;
+}
+
+.docs-content th{
+  color:var(--text);
+
+  font-weight:700;
+}
+
+.docs-content td{
+  color:var(--text-secondary);
+}
+
+.docs-content tr:last-child td{
+  border-bottom:0;
+}
+
+
+/* =========================================================
+   IMAGES
+========================================================= */
+
+.docs-content img{
+  display:block;
+
+  max-width:100%;
+  height:auto;
+
+  margin:28px 0;
+
+  border:1px solid var(--border);
+
+  border-radius:12px;
+
+  box-shadow:var(--shadow);
+}
+
+
+/* =========================================================
+   HORIZONTAL RULE
+========================================================= */
+
+.docs-content > hr{
+  margin:34px 0;
+}
+
+
+/* =========================================================
+   DOCS HOME
+========================================================= */
+
+.docs-home{
+  min-width:0;
+}
+
+.docs-home-header{
+  margin-bottom:40px;
+}
+
+.docs-home-header h1{
+  margin:0 0 12px;
+
+  color:var(--text);
+
+  font-size:
+    clamp(
+      2.2rem,
+      5vw,
+      3.4rem
+    );
+
+  line-height:1.15;
+
+  letter-spacing:-.025em;
+}
+
+.docs-home-description{
+  max-width:700px;
+
+  margin:0;
+
+  color:var(--text-secondary);
+
+  font-size:18px;
+
+  line-height:1.7;
+}
+
+
+/* =========================================================
+   DOCS CARDS
+========================================================= */
+
+.docs-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+
+  gap:18px;
+}
+
+.docs-card{
+  display:block;
+
+  padding:22px;
+
+  color:var(--text);
+
+  background:var(--surface);
+
+  border:1px solid var(--border);
+
+  border-radius:var(--radius);
+
+  box-shadow:none;
+
+  transition:
+    transform var(--transition),
+    background var(--transition),
+    border-color var(--transition),
+    box-shadow var(--transition);
+}
+
+.docs-card:hover{
+  color:var(--text);
+
+  background:var(--surface-hover);
+
+  border-color:var(--primary);
+
+  transform:translateY(-2px);
+
+  box-shadow:var(--shadow);
+}
+
+.docs-card-category{
+  display:inline-block;
+
+  margin-bottom:10px;
+
+  color:var(--primary);
+
+  font-size:11px;
+  font-weight:700;
+
+  letter-spacing:.06em;
+
+  text-transform:uppercase;
+}
+
+.docs-card-title{
+  margin:0 0 8px;
+
+  color:var(--text);
+
+  font-size:18px;
+  font-weight:700;
+
+  line-height:1.35;
+}
+
+.docs-card-description{
+  margin:0;
+
+  color:var(--text-secondary);
+
+  font-size:14px;
+
+  line-height:1.65;
+}
+
+
+/* =========================================================
+   PREVIOUS / NEXT NAVIGATION
+========================================================= */
+
+.docs-pagination{
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:16px;
+
+  margin-top:60px;
+
+  padding-top:28px;
+
+  border-top:1px solid var(--border);
+}
+
+.docs-pagination a{
+  display:flex;
+
+  flex-direction:column;
+
+  gap:6px;
+
+  padding:16px;
+
+  color:var(--text);
+
+  background:var(--surface);
+
+  border:1px solid var(--border);
+
+  border-radius:var(--radius);
+
+  text-decoration:none;
+
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    transform var(--transition);
+}
+
+.docs-pagination a:hover{
+  color:var(--text);
+
+  background:var(--surface-hover);
+
+  border-color:var(--primary);
+
+  transform:translateY(-2px);
+}
+
+.docs-pagination a.next{
+  text-align:right;
+
+  align-items:flex-end;
+}
+
+.docs-pagination-label{
+  color:var(--text-secondary);
+
+  font-size:12px;
+
+  text-transform:uppercase;
+
+  letter-spacing:.06em;
+}
+
+.docs-pagination-title{
+  color:var(--text);
+
+  font-size:14px;
+  font-weight:700;
+}
+
+
+/* =========================================================
+   MOBILE SIDEBAR
+========================================================= */
+
+.docs-mobile-nav{
+  display:none;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media(max-width:900px){
+
+  .docs-page{
+    padding:
+      32px
+      20px
+      70px;
+  }
+
+  .docs-shell{
+    grid-template-columns:1fr;
+
+    gap:32px;
+  }
+
+  .docs-sidebar{
+    position:static;
+
+    padding-bottom:28px;
+
+    border-bottom:1px solid var(--border);
+  }
+
+  .docs-nav{
+    display:grid;
+
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+
+    gap:22px;
+  }
+
+  .docs-content{
+    max-width:none;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:600px){
+
+  .docs-page{
+    padding:
+      24px
+      14px
+      60px;
+  }
+
+  .docs-shell{
+    gap:24px;
+  }
+
+  .docs-sidebar{
+    padding-bottom:22px;
+  }
+
+  .docs-nav{
+    grid-template-columns:1fr;
+
+    gap:20px;
+  }
+
+  .docs-content{
+    font-size:15px;
+
+    line-height:1.75;
+  }
+
+  .docs-content h2{
+    margin-top:38px;
+
+    font-size:1.55rem;
+  }
+
+  .docs-content h3{
+    margin-top:28px;
+
+    font-size:1.25rem;
+  }
+
+  .docs-content .lead,
+  .docs-description,
+  .docs-home-description{
+    font-size:16px;
+  }
+
+  .docs-content pre{
+    margin-left:0;
+    margin-right:0;
+
+    padding:16px;
+
+    border-radius:10px;
+
+    font-size:12px;
+  }
+
+  .docs-content table{
+    display:block;
+
+    overflow-x:auto;
+
+    white-space:nowrap;
+  }
+
+  .docs-grid{
+    grid-template-columns:1fr;
+
+    gap:14px;
+  }
+
+  .docs-pagination{
+    grid-template-columns:1fr;
+
+    gap:10px;
+  }
+
+  .docs-pagination a.next{
+    text-align:left;
+
+    align-items:flex-start;
+  }
+
+}
+
+
+/* =========================================================
+   VERY SMALL SCREEN
+========================================================= */
+
+@media(max-width:420px){
+
+  .docs-page{
+    padding-left:12px;
+    padding-right:12px;
+  }
+
+  .docs-content h1,
+  .docs-home-header h1{
+    font-size:2rem;
+  }
+
+  .docs-card{
+    padding:18px;
+  }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+  .docs-link,
+  .docs-card,
+  .docs-pagination a,
+  .docs-filter{
+    transition:none;
+  }
+
+}

@@ -1,1 +1,146 @@
+---
+import { getCollection } from "astro:content";
+import MainLayout from "../../layouts/MainLayout.astro";
+import "../../styles/docs.css";
 
+const docs = await getCollection("docs");
+
+const sections = Object.entries(
+  docs.reduce<Record<string, typeof docs>>((groups, doc) => {
+    const section = doc.data.section;
+
+    if (!groups[section]) {
+      groups[section] = [];
+    }
+
+    groups[section].push(doc);
+
+    return groups;
+  }, {})
+)
+  .map(([title, items]) => ({
+    title,
+    items: items.sort(
+      (a, b) => (a.data.order ?? 999) - (b.data.order ?? 999)
+    ),
+  }))
+  .sort((a, b) => a.title.localeCompare(b.title));
+---
+
+<MainLayout
+  title="Documentation"
+  description="Documentation, guides, tools, products, and resources."
+>
+  <main class="docs-index">
+
+    <!-- =========================================
+         DOCS HEADER
+    ========================================== -->
+
+    <section class="docs-hero">
+      <div class="docs-container">
+
+        <div class="docs-eyebrow">
+          DOCUMENTATION
+        </div>
+
+        <h1>
+          Documentation
+        </h1>
+
+        <p>
+          Panduan, referensi, dan dokumentasi lengkap untuk tools,
+          products, blog, dan layanan yang tersedia.
+        </p>
+
+      </div>
+    </section>
+
+
+    <!-- =========================================
+         DOCS CONTENT
+    ========================================== -->
+
+    <section class="docs-directory">
+      <div class="docs-container">
+
+        <div class="docs-directory-header">
+          <div>
+            <span class="docs-label">
+              EXPLORE
+            </span>
+
+            <h2>
+              Documentation
+            </h2>
+          </div>
+
+          <span class="docs-count">
+            {docs.length} {docs.length === 1 ? "document" : "documents"}
+          </span>
+        </div>
+
+
+        <!-- =========================================
+             DOCUMENTATION SECTIONS
+        ========================================== -->
+
+        <div class="docs-sections">
+
+          {
+            sections.map((section) => (
+              <section class="docs-section">
+
+                <div class="docs-section-header">
+                  <h3>
+                    {section.title}
+                  </h3>
+
+                  <span>
+                    {section.items.length}
+                  </span>
+                </div>
+
+
+                <div class="docs-grid">
+
+                  {
+                    section.items.map((doc) => (
+                      <a
+                        href={`/docs/${doc.slug}/`}
+                        class="docs-card"
+                      >
+
+                        <div class="docs-card-content">
+
+                          <h4>
+                            {doc.data.title}
+                          </h4>
+
+                          <p>
+                            {doc.data.description}
+                          </p>
+
+                        </div>
+
+                        <div class="docs-card-arrow" aria-hidden="true">
+                          →
+                        </div>
+
+                      </a>
+                    ))
+                  }
+
+                </div>
+
+              </section>
+            ))
+          }
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</MainLayout>

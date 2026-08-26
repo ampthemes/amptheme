@@ -3,33 +3,72 @@ import { getCollection, render } from "astro:content";
 import MainLayout from "../../layouts/MainLayout.astro";
 import "../../styles/docs.css";
 
+/*
+ * =====================================
+ * STATIC PATHS
+ * =====================================
+ */
+
 export async function getStaticPaths() {
   const docs = await getCollection("docs");
 
   return docs.map((doc) => ({
     params: {
-      slug: doc.slug,
+      slug: doc.id,
     },
+
     props: {
       doc,
     },
   }));
 }
 
+
+/*
+ * =====================================
+ * CURRENT DOCUMENT
+ * =====================================
+ */
+
 const { doc } = Astro.props;
 
 const { Content } = await render(doc);
 
-const docs = await getCollection("docs");
 
 /*
- * Group docs berdasarkan category.
- * Jika frontmatter category tidak ada,
- * otomatis masuk ke "Documentation".
+ * =====================================
+ * ALL DOCUMENTS
+ * =====================================
  */
-const groups = docs.reduce(
+
+const docs = await getCollection("docs");
+
+
+/*
+ * =====================================
+ * SORT DOCUMENTS
+ * =====================================
+ */
+
+const sortedDocs = [...docs].sort(
+  (a, b) =>
+    (a.data.order ?? 999) -
+    (b.data.order ?? 999)
+);
+
+
+/*
+ * =====================================
+ * GROUP DOCUMENTS
+ * =====================================
+ */
+
+const groups = sortedDocs.reduce(
   (acc, item) => {
-    const category = item.data.category || "Documentation";
+
+    const category =
+      item.data.category ||
+      "Documentation";
 
     if (!acc[category]) {
       acc[category] = [];
@@ -41,14 +80,40 @@ const groups = docs.reduce(
   },
   {} as Record<string, typeof docs>
 );
+
+
+/*
+ * =====================================
+ * CURRENT / PREVIOUS / NEXT
+ * =====================================
+ */
+
+const currentIndex =
+  sortedDocs.findIndex(
+    (item) => item.id === doc.id
+  );
+
+const previous =
+  currentIndex > 0
+    ? sortedDocs[currentIndex - 1]
+    : null;
+
+const next =
+  currentIndex >= 0 &&
+  currentIndex < sortedDocs.length - 1
+    ? sortedDocs[currentIndex + 1]
+    : null;
 ---
 
 <MainLayout
   title={`${doc.data.title} — Docs`}
   description={doc.data.description}
 >
+
   <main class="docs-page">
+
     <div class="docs-shell">
+
 
       <!-- =================================
            SIDEBAR
@@ -56,7 +121,11 @@ const groups = docs.reduce(
 
       <aside class="docs-sidebar">
 
+
+        <!-- FILTER -->
+
         <div class="docs-filter">
+
           <svg
             viewBox="0 0 24 24"
             width="16"
@@ -89,62 +158,103 @@ const groups = docs.reduce(
             placeholder="Filter docs..."
             aria-label="Filter documentation"
           />
+
         </div>
+
+
+        <!-- =================================
+             DOCUMENTATION NAVIGATION
+        ================================== -->
 
         <nav aria-label="Documentation">
 
           {
             Object.entries(groups).map(
               ([category, items]) => (
-                <div
+
+                <details
                   class="docs-section"
+                  open
                   data-docs-section
                 >
 
-                  <p class="docs-section-title">
-                    {category}
-                  </p>
+                  <!-- CATEGORY -->
+
+                  <summary class="docs-section-title">
+
+                    <span>
+                      {category}
+                    </span>
+
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="16"
+                      height="16"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M6 9l6 6 6-6"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+
+                  </summary>
+
+
+                  <!-- DOCUMENTS -->
 
                   <ul>
 
                     {
-                      items
-                        .sort(
-                          (a, b) =>
-                            (a.data.order ?? 999) -
-                            (b.data.order ?? 999)
-                        )
-                        .map((item) => {
+                      items.map((item) => {
 
-                          const href =
-                            `/docs/${item.slug}/`;
+                        const href =
+                          `/docs/${item.id}/`;
 
-                          const active =
-                            item.slug === doc.slug;
+                        const active =
+                          item.id === doc.id;
 
-                          return (
-                            <li
-                              data-docs-item={item.data.title.toLowerCase()}
+                        return (
+
+                          <li
+                            data-docs-item={
+                              item.data.title
+                                .toLowerCase()
+                            }
+                          >
+
+                            <a
+                              href={href}
+                              class:list={[
+                                "docs-link",
+                                {
+                                  active,
+                                },
+                              ]}
+                              aria-current={
+                                active
+                                  ? "page"
+                                  : undefined
+                              }
                             >
-                              <a
-                                href={href}
-                                class:list={[
-                                  "docs-link",
-                                  {
-                                    active,
-                                  },
-                                ]}
-                              >
-                                {item.data.title}
-                              </a>
-                            </li>
-                          );
-                        })
+                              {item.data.title}
+                            </a>
+
+                          </li>
+
+                        );
+
+                      })
                     }
 
                   </ul>
 
-                </div>
+                </details>
+
               )
             )
           }
@@ -155,10 +265,13 @@ const groups = docs.reduce(
 
 
       <!-- =================================
-           DOCUMENTATION CONTENT
+           DOCUMENT CONTENT
       ================================== -->
 
       <article class="docs-content">
+
+
+        <!-- HEADER -->
 
         <header class="docs-header">
 
@@ -181,11 +294,17 @@ const groups = docs.reduce(
         </header>
 
 
+        <!-- DIVIDER -->
+
         <hr />
 
 
+        <!-- CONTENT -->
+
         <div class="docs-prose">
+
           <Content />
+
         </div>
 
 
@@ -193,86 +312,83 @@ const groups = docs.reduce(
              PREVIOUS / NEXT
         ================================== -->
 
-        <nav
-          class="docs-pagination"
-          aria-label="Documentation navigation"
-        >
+        {
+          (previous || next) && (
 
-          {
-            (() => {
+            <nav
+              class="docs-pagination"
+              aria-label="Documentation navigation"
+            >
 
-              const sortedDocs = [...docs].sort(
-                (a, b) =>
-                  (a.data.order ?? 999) -
-                  (b.data.order ?? 999)
-              );
+              {
+                previous ? (
 
-              const currentIndex =
-                sortedDocs.findIndex(
-                  (item) => item.slug === doc.slug
-                );
+                  <a
+                    href={`/docs/${previous.id}/`}
+                    class="docs-pagination-item previous"
+                  >
 
-              const previous =
-                currentIndex > 0
-                  ? sortedDocs[currentIndex - 1]
-                  : null;
+                    <span>
+                      Previous
+                    </span>
 
-              const next =
-                currentIndex < sortedDocs.length - 1
-                  ? sortedDocs[currentIndex + 1]
-                  : null;
+                    <strong>
+                      {previous.data.title}
+                    </strong>
 
-              return (
-                <>
-                  {
-                    previous ? (
-                      <a
-                        href={`/docs/${previous.slug}/`}
-                        class="docs-pagination-item previous"
-                      >
-                        <span>Previous</span>
+                  </a>
 
-                        <strong>
-                          {previous.data.title}
-                        </strong>
-                      </a>
-                    ) : (
-                      <span />
-                    )
-                  }
+                ) : (
 
-                  {
-                    next ? (
-                      <a
-                        href={`/docs/${next.slug}/`}
-                        class="docs-pagination-item next"
-                      >
-                        <span>Next</span>
+                  <span />
 
-                        <strong>
-                          {next.data.title}
-                        </strong>
-                      </a>
-                    ) : (
-                      <span />
-                    )
-                  }
-                </>
-              );
-            })()
-          }
+                )
+              }
 
-        </nav>
+
+              {
+                next ? (
+
+                  <a
+                    href={`/docs/${next.id}/`}
+                    class="docs-pagination-item next"
+                  >
+
+                    <span>
+                      Next
+                    </span>
+
+                    <strong>
+                      {next.data.title}
+                    </strong>
+
+                  </a>
+
+                ) : (
+
+                  <span />
+
+                )
+              }
+
+            </nav>
+
+          )
+        }
 
       </article>
 
     </div>
+
   </main>
 
 
-  <!-- =================================
+  <!-- =====================================
        DOCS FILTER
-  ================================== -->
+       Hanya untuk pencarian.
+       Collapse menggunakan <details>
+       sehingga tidak membutuhkan JS.
+  ====================================== -->
 
   <script>
     const filter =
@@ -284,15 +400,18 @@ const groups = docs.reduce(
       );
 
     filter?.addEventListener("input", () => {
+
       const query =
         (filter as HTMLInputElement)
           .value
           .trim()
           .toLowerCase();
 
+
       sections.forEach((section) => {
 
         let visible = 0;
+
 
         section
           .querySelectorAll("[data-docs-item]")
@@ -303,24 +422,36 @@ const groups = docs.reduce(
                 "data-docs-item"
               ) || "";
 
+
             const match =
               text.includes(query);
+
 
             (
               item as HTMLElement
             ).style.display =
-              match ? "" : "none";
+              match
+                ? ""
+                : "none";
+
 
             if (match) {
               visible++;
             }
+
           });
+
 
         (
           section as HTMLElement
         ).style.display =
-          visible > 0 ? "" : "none";
+          visible > 0
+            ? ""
+            : "none";
+
       });
+
     });
   </script>
+
 </MainLayout>

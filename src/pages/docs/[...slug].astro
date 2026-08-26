@@ -8,7 +8,7 @@ export async function getStaticPaths() {
 
   return docs.map((doc) => ({
     params: {
-      slug: doc.id,
+      slug: doc.slug,
     },
     props: {
       doc,
@@ -27,17 +27,20 @@ const docs = await getCollection("docs");
  * Jika frontmatter category tidak ada,
  * otomatis masuk ke "Documentation".
  */
-const groups = docs.reduce((acc, item) => {
-  const category = item.data.category || "Documentation";
+const groups = docs.reduce(
+  (acc, item) => {
+    const category = item.data.category || "Documentation";
 
-  if (!acc[category]) {
-    acc[category] = [];
-  }
+    if (!acc[category]) {
+      acc[category] = [];
+    }
 
-  acc[category].push(item);
+    acc[category].push(item);
 
-  return acc;
-}, {} as Record<string, typeof docs>);
+    return acc;
+  },
+  {} as Record<string, typeof docs>
+);
 ---
 
 <MainLayout
@@ -88,63 +91,63 @@ const groups = docs.reduce((acc, item) => {
           />
         </div>
 
-
         <nav aria-label="Documentation">
 
-          {Object.entries(groups).map(
-            ([category, items]) => (
+          {
+            Object.entries(groups).map(
+              ([category, items]) => (
+                <div
+                  class="docs-section"
+                  data-docs-section
+                >
 
-              <div
-                class="docs-section"
-                data-docs-section
-              >
+                  <p class="docs-section-title">
+                    {category}
+                  </p>
 
-                <p class="docs-section-title">
-                  {category}
-                </p>
+                  <ul>
 
-                <ul>
+                    {
+                      items
+                        .sort(
+                          (a, b) =>
+                            (a.data.order ?? 999) -
+                            (b.data.order ?? 999)
+                        )
+                        .map((item) => {
 
-                  {items
-                    .sort(
-                      (a, b) =>
-                        (a.data.order ?? 999) -
-                        (b.data.order ?? 999)
-                    )
-                    .map((item) => {
+                          const href =
+                            `/docs/${item.slug}/`;
 
-                      const href =
-                        `/docs/${item.id}/`;
+                          const active =
+                            item.slug === doc.slug;
 
-                      const active =
-                        item.id === doc.id;
+                          return (
+                            <li
+                              data-docs-item={item.data.title.toLowerCase()}
+                            >
+                              <a
+                                href={href}
+                                class:list={[
+                                  "docs-link",
+                                  {
+                                    active,
+                                  },
+                                ]}
+                              >
+                                {item.data.title}
+                              </a>
+                            </li>
+                          );
+                        })
+                    }
 
-                      return (
-                        <li
-                          data-docs-item={item.data.title
-                            .toLowerCase()}
-                        >
-                          <a
-                            href={href}
-                            class:list={[
-                              "docs-link",
-                              {
-                                active,
-                              },
-                            ]}
-                          >
-                            {item.data.title}
-                          </a>
-                        </li>
-                      );
-                    })}
+                  </ul>
 
-                </ul>
-
-              </div>
-
+                </div>
+              )
             )
-          )}
+          }
 
         </nav>
 
@@ -167,11 +170,13 @@ const groups = docs.reduce((acc, item) => {
             {doc.data.title}
           </h1>
 
-          {doc.data.description && (
-            <p class="docs-lead">
-              {doc.data.description}
-            </p>
-          )}
+          {
+            doc.data.description && (
+              <p class="docs-lead">
+                {doc.data.description}
+              </p>
+            )
+          }
 
         </header>
 
@@ -188,11 +193,15 @@ const groups = docs.reduce((acc, item) => {
              PREVIOUS / NEXT
         ================================== -->
 
-        <nav class="docs-pagination" aria-label="Documentation navigation">
+        <nav
+          class="docs-pagination"
+          aria-label="Documentation navigation"
+        >
 
           {
             (() => {
-              const sortedDocs = docs.sort(
+
+              const sortedDocs = [...docs].sort(
                 (a, b) =>
                   (a.data.order ?? 999) -
                   (b.data.order ?? 999)
@@ -200,7 +209,7 @@ const groups = docs.reduce((acc, item) => {
 
               const currentIndex =
                 sortedDocs.findIndex(
-                  (item) => item.id === doc.id
+                  (item) => item.slug === doc.slug
                 );
 
               const previous =
@@ -215,35 +224,39 @@ const groups = docs.reduce((acc, item) => {
 
               return (
                 <>
-                  {previous ? (
-                    <a
-                      href={`/docs/${previous.id}/`}
-                      class="docs-pagination-item previous"
-                    >
-                      <span>Previous</span>
+                  {
+                    previous ? (
+                      <a
+                        href={`/docs/${previous.slug}/`}
+                        class="docs-pagination-item previous"
+                      >
+                        <span>Previous</span>
 
-                      <strong>
-                        {previous.data.title}
-                      </strong>
-                    </a>
-                  ) : (
-                    <span />
-                  )}
+                        <strong>
+                          {previous.data.title}
+                        </strong>
+                      </a>
+                    ) : (
+                      <span />
+                    )
+                  }
 
-                  {next ? (
-                    <a
-                      href={`/docs/${next.id}/`}
-                      class="docs-pagination-item next"
-                    >
-                      <span>Next</span>
+                  {
+                    next ? (
+                      <a
+                        href={`/docs/${next.slug}/`}
+                        class="docs-pagination-item next"
+                      >
+                        <span>Next</span>
 
-                      <strong>
-                        {next.data.title}
-                      </strong>
-                    </a>
-                  ) : (
-                    <span />
-                  )}
+                        <strong>
+                          {next.data.title}
+                        </strong>
+                      </a>
+                    ) : (
+                      <span />
+                    )
+                  }
                 </>
               );
             })()
